@@ -1,7 +1,7 @@
 package org.example.project.kmmchat.domain.model
 
-import org.example.project.kmmchat.presentation.ChatType
-import org.example.project.kmmchat.presentation.ContentType
+import org.example.project.kmmchat.util.ChatType
+import org.example.project.kmmchat.util.ContentType
 
 data class MessageRequest(
     val token: String,

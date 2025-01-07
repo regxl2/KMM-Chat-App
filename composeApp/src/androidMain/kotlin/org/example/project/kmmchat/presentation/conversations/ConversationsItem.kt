@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.example.project.kmmchat.presentation.ChatType
+import org.example.project.kmmchat.util.ChatType
 
 @Composable
 fun ConversationsItem(

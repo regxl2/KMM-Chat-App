@@ -1,7 +1,7 @@
 package org.example.project.kmmchat.presentation.chat
 
 import org.example.project.kmmchat.domain.model.ChatRequest
-import org.example.project.kmmchat.presentation.ChatType
+import org.example.project.kmmchat.util.ChatType
 import org.example.project.kmmchat.presentation.conversations.MessageResponseUI
 
 

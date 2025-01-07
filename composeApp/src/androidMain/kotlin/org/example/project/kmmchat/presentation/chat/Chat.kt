@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.example.project.kmmchat.presentation.ChatType
+import org.example.project.kmmchat.util.ChatType
 import org.example.project.kmmchat.presentation.common.CircularIndicatorBox
 import org.example.project.kmmchat.presentation.conversations.MessageResponseUI
 import org.koin.androidx.compose.koinViewModel
@@ -46,7 +46,7 @@ fun Chat(
     }
 
     LaunchedEffect(chatUiState) {
-        if(chatUiState.messages.size > 0){
+        if(chatUiState.messages.isNotEmpty()){
             listState.scrollToItem(index = chatUiState.messages.size - 1)
         }
     }

@@ -23,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import org.example.project.kmmchat.presentation.ContentType
+import org.example.project.kmmchat.util.ContentType
 import org.example.project.kmmchat.presentation.conversations.MessageResponseUI
 
 @Composable

@@ -2,8 +2,8 @@ package org.example.project.kmmchat.data.remote.chat_data_source
 
 import kotlinx.serialization.Serializable
 import org.example.project.kmmchat.domain.model.MessageRequest
-import org.example.project.kmmchat.presentation.ChatType
-import org.example.project.kmmchat.presentation.ContentType
+import org.example.project.kmmchat.util.ChatType
+import org.example.project.kmmchat.util.ContentType
 
 @Serializable
 data class MessageRequestDto(

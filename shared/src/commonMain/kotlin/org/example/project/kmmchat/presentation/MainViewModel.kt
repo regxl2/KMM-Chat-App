@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.stateIn
 import org.example.project.kmmchat.domain.usecase.AuthenticateUseCase
 import org.example.project.kmmchat.domain.usecase.GetTokenUseCase
 import org.example.project.kmmchat.domain.usecase.SetUserIdUseCase
+import org.example.project.kmmchat.util.Destination
 import org.example.project.kmmchat.util.Result
 
 class MainViewModel(

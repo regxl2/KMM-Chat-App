@@ -41,50 +41,45 @@ class ConversationsViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getConversationList() {
         viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                _error.value = null
+            _isLoading.value = true
+            _error.value = null
 
-                combine(getUserIdUseCase(), getTokenUseCase()) { userId, token ->
-                    Pair(userId, token)
-                }
-                    .flatMapLatest { (userId, token) ->
-                        if (userId == null || token == null) {
-                            flow { emit(ConversationsUI()) }
-                        } else {
-                            flow {
-                                try {
-                                    _userId.value = userId
-                                    when (val result =
-                                        conversationRepository.getConversations(token)) {
-                                        is Result.Success -> {
-                                            val conversations =
-                                                result.data?.conversations?.map { it.toConversationUI() }
-                                            if (conversations != null) {
-                                                emit(ConversationsUI(conversations = conversations))
-                                            } else {
-                                                throw Exception("Empty data")
-                                            }
-                                        }
-
-                                        is Result.Error -> throw Exception(result.message)
+            combine(getUserIdUseCase(), getTokenUseCase()) { userId, token ->
+                Pair(userId, token)
+            }
+                .flatMapLatest { (userId, token) ->
+                    if (userId == null || token == null) {
+                        flow { emit(ConversationsUI()) }
+                    } else {
+                        flow {
+                            _userId.value = userId
+                            when (val result =
+                                conversationRepository.getConversations(token)) {
+                                is Result.Success -> {
+                                    val conversations =
+                                        result.data?.conversations?.map { it.toConversationUI() }
+                                    if (conversations != null) {
+                                        emit(ConversationsUI(conversations = conversations))
+                                    } else {
+                                        emit(ConversationsUI())
+                                        _error.value = "No Conversation Found"
                                     }
-                                } catch (e: Exception) {
-                                    _error.value = e.message ?: "Something went wrong"
+                                }
+
+                                is Result.Error -> {
                                     emit(ConversationsUI())
+                                    _error.value = result.message
                                 }
                             }
                         }
                     }
-                    .filter { it.conversations.isNotEmpty() }
-                    .collect { newConversationUiState ->
-                        _conversationUiState.value = newConversationUiState
-                    }
-            } catch (e: Exception) {
-                _error.value = e.message ?: "Something went wrong"
-            } finally {
-                _isLoading.value = false
-            }
+                }
+                .filter { it.conversations.isNotEmpty() }
+                .collect { newConversationUiState ->
+                    _conversationUiState.value = newConversationUiState
+                    _isLoading.value = false
+                }
+            _isLoading.value = false
         }
     }
 }

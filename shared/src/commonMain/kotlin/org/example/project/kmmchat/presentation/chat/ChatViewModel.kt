@@ -16,8 +16,8 @@ import org.example.project.kmmchat.domain.model.MessageRequest
 import org.example.project.kmmchat.domain.repository.ChatRepository
 import org.example.project.kmmchat.domain.usecase.GetTokenUseCase
 import org.example.project.kmmchat.domain.usecase.GetUserIdUseCase
-import org.example.project.kmmchat.presentation.ChatType
-import org.example.project.kmmchat.presentation.ContentType
+import org.example.project.kmmchat.util.ChatType
+import org.example.project.kmmchat.util.ContentType
 import org.example.project.kmmchat.presentation.conversations.toMessageResponseUI
 import org.example.project.kmmchat.util.Result
 

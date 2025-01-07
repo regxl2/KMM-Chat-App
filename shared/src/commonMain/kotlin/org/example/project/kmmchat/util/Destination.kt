@@ -1,4 +1,4 @@
-package org.example.project.kmmchat.presentation
+package org.example.project.kmmchat.util
 
 enum class Destination {
     LOADING,

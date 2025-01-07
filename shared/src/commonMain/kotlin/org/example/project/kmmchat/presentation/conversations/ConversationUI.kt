@@ -1,7 +1,7 @@
 package org.example.project.kmmchat.presentation.conversations
 
 import org.example.project.kmmchat.domain.model.Conversation
-import org.example.project.kmmchat.presentation.ChatType
+import org.example.project.kmmchat.util.ChatType
 
 data class ConversationUI(
     val conversationId: String,

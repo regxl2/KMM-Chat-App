@@ -79,7 +79,6 @@ class WebSocketDataSource(
                 disconnect()
                 null
             }
-
             else -> null
         }
     }

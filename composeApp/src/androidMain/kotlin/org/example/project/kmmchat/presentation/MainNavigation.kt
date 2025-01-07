@@ -14,6 +14,8 @@ import org.example.project.kmmchat.presentation.chat.Chat
 import org.example.project.kmmchat.presentation.conversations.Conversations
 import org.example.project.kmmchat.presentation.loading.Loading
 import org.example.project.kmmchat.presentation.new_conversation.NewConversation
+import org.example.project.kmmchat.util.ChatType
+import org.example.project.kmmchat.util.Destination
 
 @Composable
 fun MainNavigation(destination: Destination) {

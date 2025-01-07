@@ -12,7 +12,7 @@ import Shared
 struct MessageItem: View {
     let message: MessageResponseUI
     var body: some View {
-        HStack{
+        HStack(alignment: .top){
             if(!message.isMine){
 //                AsyncImage(url: URL(string: message.senderName)){
 //                    phase in
@@ -32,7 +32,7 @@ struct MessageItem: View {
             else{
                 Spacer()
             }
-            VStack(alignment: .leading){
+            VStack(alignment: .leading, spacing: 4){
                 if(!message.isMine){
                     Text(message.senderName)
                         .fontWeight(.bold)
@@ -60,11 +60,11 @@ struct MessageItem: View {
                     }
                 case .text:
                     Text(message.content)
-                        .padding(16)
+                        .padding(.all, 8)
                         .background(Color.gray.opacity(0.2))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
-                Text(message.createdAt)
+                Text(message.createdAt).font(Font.system(size: 12))
             }
             if(!message.isMine){
                 Spacer()

@@ -4,7 +4,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.example.project.kmmchat.domain.model.MessageResponse
-import org.example.project.kmmchat.presentation.ContentType
+import org.example.project.kmmchat.util.ContentType
 
 data class MessageResponseUI(
     val id: String,
