@@ -3,9 +3,11 @@ package org.example.project.kmmchat.data.remote.user_data_source
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.headers
+import io.ktor.client.request.parameter
+import io.ktor.http.HttpHeaders
 import io.ktor.http.appendPathSegments
 import io.ktor.http.isSuccess
-import io.ktor.http.parameters
 import org.example.project.kmmchat.data.remote.common_dto.ErrorDto
 import org.example.project.kmmchat.data.remote.user_data_source.dto.UsersDto
 import org.example.project.kmmchat.util.Result
@@ -16,15 +18,16 @@ class UserDataSource(
 ) {
     private val apiUrl = "$url/user"
 
-    suspend fun searchUsers(query: String): Result<UsersDto>{
+    suspend fun searchUsers(query: String, token: String): Result<UsersDto>{
         return try{
             val response = httpClient.get(urlString = apiUrl){
                 url {
                     appendPathSegments("search")
                 }
-                parameters{
-                    append("query", query)
+                headers {
+                    append(HttpHeaders.Authorization, "Bearer $token")
                 }
+                parameter("query", query)
             }
             if(response.status.isSuccess()){
                 Result.Success(data = response.body<UsersDto>())

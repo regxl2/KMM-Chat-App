@@ -11,7 +11,7 @@ data class ConversationDto(
     val conversationId: String,
     val conversationType: String,
     @SerialName("lastMessage")
-    val messageResponseDto: MessageResponseDto,
+    val messageResponseDto: MessageResponseDto?,
     val name: String
 )
 
@@ -19,7 +19,7 @@ fun ConversationDto.toConversation(): Conversation{
     return Conversation(
         conversationId = conversationId,
         conversationType = conversationType,
-        messageResponse = messageResponseDto.toMessageResponse(),
+        messageResponse = messageResponseDto?.toMessageResponse(),
         name = name
     )
 }

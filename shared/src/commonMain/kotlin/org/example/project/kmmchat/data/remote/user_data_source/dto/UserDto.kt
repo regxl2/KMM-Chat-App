@@ -13,5 +13,5 @@ data class UserDto(
 )
 
 fun UserDto.toUser(): User {
-    return User(id = id, email = email, name = name)
+    return User(email = email, name = name)
 }

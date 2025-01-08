@@ -17,6 +17,7 @@ import org.example.project.kmmchat.presentation.auth.SignInViewModel
 import org.example.project.kmmchat.presentation.auth.SignUpViewModel
 import org.example.project.kmmchat.presentation.chat.ChatViewModel
 import org.example.project.kmmchat.presentation.conversations.ConversationsViewModel
+import org.example.project.kmmchat.presentation.new_conversation.NewConversationViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.qualifier.named
@@ -61,5 +62,5 @@ actual val platformModule = module {
     viewModelOf(::MainViewModel)
     viewModelOf(::ConversationsViewModel)
     viewModelOf(::ChatViewModel)
-
+    viewModelOf(::NewConversationViewModel)
 }

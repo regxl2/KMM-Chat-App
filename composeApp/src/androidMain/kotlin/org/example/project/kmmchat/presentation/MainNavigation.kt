@@ -18,7 +18,7 @@ import org.example.project.kmmchat.util.ChatType
 import org.example.project.kmmchat.util.Destination
 
 @Composable
-fun MainNavigation(destination: Destination) {
+fun MainNavigation(destination: Destination, userId: String) {
     val navController = rememberNavController()
     val startDestination = when (destination) {
         Destination.AUTH -> NavRoutes.Auth
@@ -66,9 +66,24 @@ fun MainNavigation(destination: Destination) {
         composable<NavRoutes.NewConversation>(
             enterTransition = { enterTransition() },
             exitTransition = { exitTransition() }) {
-            NewConversation(onNavigateBack = { navController.popBackStack() })
+            NewConversation(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateChat = { user ->
+                    navController.navigate(
+                        NavRoutes.Chat(
+                            conversationId = getConversationId(userId, user.email),
+                            conversationType = "chat",
+                            name = user.name
+                        )
+                    )
+                }
+            )
         }
     }
+}
+
+private fun getConversationId(userId: String, email: String): String{
+    return listOf(userId, email).sorted().joinToString("-")
 }
 
 fun enterTransition(): EnterTransition {

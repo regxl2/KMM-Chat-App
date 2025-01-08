@@ -2,13 +2,9 @@ package org.example.project.kmmchat.presentation.conversations
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.example.project.kmmchat.domain.repository.ConversationRepository
 import org.example.project.kmmchat.domain.usecase.GetTokenUseCase
@@ -38,47 +34,30 @@ class ConversationsViewModel(
         getConversationList()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+
     fun getConversationList() {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
-
-            combine(getUserIdUseCase(), getTokenUseCase()) { userId, token ->
-                Pair(userId, token)
+            val userId = getUserIdUseCase().firstOrNull()
+            val token = getTokenUseCase().firstOrNull()
+            if (userId.isNullOrEmpty() || token.isNullOrEmpty()) {
+                _isLoading.value = false
+                _error.value = "Invalid credentials"
+                return@launch
             }
-                .flatMapLatest { (userId, token) ->
-                    if (userId == null || token == null) {
-                        flow { emit(ConversationsUI()) }
-                    } else {
-                        flow {
-                            _userId.value = userId
-                            when (val result =
-                                conversationRepository.getConversations(token)) {
-                                is Result.Success -> {
-                                    val conversations =
-                                        result.data?.conversations?.map { it.toConversationUI() }
-                                    if (conversations != null) {
-                                        emit(ConversationsUI(conversations = conversations))
-                                    } else {
-                                        emit(ConversationsUI())
-                                        _error.value = "No Conversation Found"
-                                    }
-                                }
-
-                                is Result.Error -> {
-                                    emit(ConversationsUI())
-                                    _error.value = result.message
-                                }
-                            }
-                        }
+            when (val result = conversationRepository.getConversations(token)) {
+                is Result.Success -> {
+                    if (result.data != null) {
+                        println(result.data.conversations.size)
+                        _conversationUiState.value =
+                            ConversationsUI(conversations = result.data.conversations.map { it.toConversationUI() })
                     }
                 }
-                .filter { it.conversations.isNotEmpty() }
-                .collect { newConversationUiState ->
-                    _conversationUiState.value = newConversationUiState
-                    _isLoading.value = false
+                is Result.Error -> {
+                    _error.value = result.message
                 }
+            }
             _isLoading.value = false
         }
     }

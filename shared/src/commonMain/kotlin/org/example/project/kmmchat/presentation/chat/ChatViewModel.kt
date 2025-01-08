@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -16,9 +15,9 @@ import org.example.project.kmmchat.domain.model.MessageRequest
 import org.example.project.kmmchat.domain.repository.ChatRepository
 import org.example.project.kmmchat.domain.usecase.GetTokenUseCase
 import org.example.project.kmmchat.domain.usecase.GetUserIdUseCase
+import org.example.project.kmmchat.presentation.conversations.toMessageResponseUI
 import org.example.project.kmmchat.util.ChatType
 import org.example.project.kmmchat.util.ContentType
-import org.example.project.kmmchat.presentation.conversations.toMessageResponseUI
 import org.example.project.kmmchat.util.Result
 
 class ChatViewModel(
@@ -86,39 +85,37 @@ class ChatViewModel(
                     flowOf()
                 }
             }.collect { message ->
+                println(message)
                 _chat.value = _chat.value.copy(messages = _chat.value.messages + message)
             }
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun loadChatInformation() {
         viewModelScope.launch {
             _loading.value = true
-            getTokenUseCase().flatMapLatest { token ->
-                flow {
-                    if (token == null) {
-                        emit(Result.Error(message = "Something went wrong or try sign in again"))
-                    } else {
-                        val chatRequest = chat.value.toChatRequest(token = token)
-                        emit(chatRepository.getInitialChatRoom(chatRequest = chatRequest))
-                    }
-                }
-            }.collect { result ->
+            _error.value = null
+            val token = getTokenUseCase().firstOrNull()
+            if(token == null){
                 _loading.value = false
-                when (result) {
-                    is Result.Error -> {
-                        _error.value = result.message
+                _error.value = "Invalid Credential"
+                return@launch
+            }
+            val chatRequest = chat.value.toChatRequest(token = token)
+            when (val result = chatRepository.getInitialChatRoom(chatRequest = chatRequest)) {
+                is Result.Error -> {
+                    _error.value = result.message
+                }
+                is Result.Success -> {
+                    if (result.data != null) {
+                        _chat.value = _chat.value.copy(messages = result.data.map { it.toMessageResponseUI() })
                     }
-
-                    is Result.Success -> {
-                        if (result.data != null) {
-                            _chat.value =
-                                _chat.value.copy(messages = result.data.map { it.toMessageResponseUI() })
-                        }
+                    else{
+                        _error.value = "No messages"
                     }
                 }
             }
+            _loading.value = false
         }
     }
 

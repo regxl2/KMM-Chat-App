@@ -13,7 +13,8 @@ class MainActivity : ComponentActivity() {
         val viewModel: MainViewModel by inject()
         setContent {
             val destination by viewModel.destination.collectAsStateWithLifecycle()
-            MainNavigation(destination = destination)
+            val userId by viewModel.userId.collectAsStateWithLifecycle()
+            MainNavigation(destination = destination, userId = userId)
         }
     }
 }
