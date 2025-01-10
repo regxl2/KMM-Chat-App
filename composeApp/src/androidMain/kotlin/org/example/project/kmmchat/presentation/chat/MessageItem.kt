@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import org.example.project.kmmchat.util.ContentType
-import org.example.project.kmmchat.presentation.conversations.MessageResponseUI
+import org.example.project.kmmchat.presentation.common.MessageResponseUI
 
 @Composable
 fun MessageItem(modifier: Modifier = Modifier, message: MessageResponseUI) {
@@ -92,5 +92,6 @@ private fun PreviewMessageItem() {
         senderName = "John Dow",
         senderId = "123",
         createdAt = "9:11, AM"
-    ))
+    )
+    )
 }

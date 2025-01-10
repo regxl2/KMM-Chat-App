@@ -24,7 +24,6 @@ import org.example.project.kmmchat.util.ChatType
 @Composable
 fun ConversationsItem(
     modifier: Modifier = Modifier,
-    userId: String,
     conversation: ConversationUI,
     onConversationClick: (conversationId: String, conversationType: ChatType, name: String) -> Unit
 ) {
@@ -60,8 +59,7 @@ fun ConversationsItem(
         ) {
             Text(text = conversation.name, fontWeight = FontWeight.SemiBold)
             Text(
-                text = conversation.messageResponse?.let { "${ if(userId == it.senderId) "You" else it.senderName}: ${it.content}" }
-                    ?: "",
+                text = conversation.messageResponse?.content ?: "",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -96,7 +94,6 @@ fun ConversationsItem(
 @Composable
 private fun PreviewConversationsItem() {
     ConversationsItem(
-        userId = "",
         conversation = ConversationUI(
             conversationId = "1",
             conversationType = ChatType.CHAT,

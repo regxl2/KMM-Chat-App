@@ -8,12 +8,12 @@ import org.example.project.kmmchat.data.remote.websocket_data_source.WebSocketDa
 import org.example.project.kmmchat.data.repository.AuthRepositoryImpl
 import org.example.project.kmmchat.data.repository.ChatRepositoryImpl
 import org.example.project.kmmchat.data.repository.ConversationRepositoryImpl
-import org.example.project.kmmchat.data.repository.NewConversationRepositoryImpl
+import org.example.project.kmmchat.data.repository.CredentialsRepositoryImpl
 import org.example.project.kmmchat.data.repository.UserRepositoryImpl
 import org.example.project.kmmchat.domain.repository.AuthRepository
 import org.example.project.kmmchat.domain.repository.ChatRepository
 import org.example.project.kmmchat.domain.repository.ConversationRepository
-import org.example.project.kmmchat.domain.repository.NewConversationRepository
+import org.example.project.kmmchat.domain.repository.CredentialsRepository
 import org.example.project.kmmchat.domain.repository.UserRepository
 import org.example.project.kmmchat.domain.usecase.AccountVerificationUseCase
 import org.example.project.kmmchat.domain.usecase.AuthenticateUseCase
@@ -78,10 +78,10 @@ val dataSourceModule = module {
 
 val repositoryModule = module {
     singleOf(::AuthRepositoryImpl).bind(AuthRepository::class)
-    singleOf(::UserRepositoryImpl).bind(UserRepository::class)
+    singleOf(::CredentialsRepositoryImpl).bind(CredentialsRepository::class)
     singleOf(::ChatRepositoryImpl).bind(ChatRepository::class)
     singleOf(::ConversationRepositoryImpl).bind(ConversationRepository::class)
-    singleOf(::NewConversationRepositoryImpl).bind(NewConversationRepository::class)
+    singleOf(::UserRepositoryImpl).bind(UserRepository::class)
 }
 
 val useCaseModule = module {

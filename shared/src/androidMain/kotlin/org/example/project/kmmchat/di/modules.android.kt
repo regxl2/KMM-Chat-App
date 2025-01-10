@@ -9,6 +9,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.example.project.kmmchat.platform.createDataStore
 import org.example.project.kmmchat.presentation.MainViewModel
+import org.example.project.kmmchat.presentation.add_room_members.AddRoomMemberViewModel
 import org.example.project.kmmchat.presentation.auth.ForgotPasswordViewModel
 import org.example.project.kmmchat.presentation.auth.OtpAccountVerifyViewModel
 import org.example.project.kmmchat.presentation.auth.OtpPassVerifyViewModel
@@ -18,6 +19,7 @@ import org.example.project.kmmchat.presentation.auth.SignUpViewModel
 import org.example.project.kmmchat.presentation.chat.ChatViewModel
 import org.example.project.kmmchat.presentation.conversations.ConversationsViewModel
 import org.example.project.kmmchat.presentation.new_conversation.NewConversationViewModel
+import org.example.project.kmmchat.presentation.new_room.NewRoomViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.qualifier.named
@@ -63,4 +65,6 @@ actual val platformModule = module {
     viewModelOf(::ConversationsViewModel)
     viewModelOf(::ChatViewModel)
     viewModelOf(::NewConversationViewModel)
+    viewModelOf(::NewRoomViewModel)
+    viewModelOf(::AddRoomMemberViewModel)
 }

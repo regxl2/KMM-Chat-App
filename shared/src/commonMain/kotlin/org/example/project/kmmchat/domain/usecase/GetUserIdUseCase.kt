@@ -1,13 +1,13 @@
 package org.example.project.kmmchat.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
-import org.example.project.kmmchat.domain.repository.UserRepository
+import org.example.project.kmmchat.domain.repository.CredentialsRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class GetUserIdUseCase: KoinComponent {
-    private val userRepository: UserRepository by inject()
+    private val credentialsRepository: CredentialsRepository by inject()
     operator fun invoke(): Flow<String?> {
-        return userRepository.getUserId()
+        return credentialsRepository.getUserId()
     }
 }

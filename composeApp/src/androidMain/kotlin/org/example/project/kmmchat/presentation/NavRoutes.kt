@@ -27,4 +27,8 @@ sealed class NavRoutes{
     data object NewConversation: NavRoutes()
     @Serializable
     data class Chat(val conversationId: String, val conversationType: String, val name: String): NavRoutes()
+    @Serializable
+    data class AddGroupMember(val conversationId: String): NavRoutes()
+    @Serializable
+    data object NewGroup: NavRoutes()
 }

@@ -15,43 +15,48 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
-import org.example.project.kmmchat.domain.repository.NewConversationRepository
+import org.example.project.kmmchat.domain.model.SearchUsersDetails
+import org.example.project.kmmchat.domain.repository.UserRepository
 import org.example.project.kmmchat.domain.usecase.GetTokenUseCase
-import org.example.project.kmmchat.domain.usecase.GetUserIdUseCase
+import org.example.project.kmmchat.presentation.common.SearchUiState
 import org.example.project.kmmchat.util.Result
 
 class NewConversationViewModel(
-    private val newConversationRepository: NewConversationRepository,
-    private val tokenUseCase: GetTokenUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val userRepository: UserRepository,
+    private val tokenUseCase: GetTokenUseCase
 ) : ViewModel() {
 
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
+    fun onQueryChange(newQuery: String) {
+        _query.value = newQuery
+    }
+
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val newConversationUiState: StateFlow<NewConversationUiState> = query
+    val searchUiState: StateFlow<SearchUiState> = query
         .debounce(1000)
         .filter { it.isNotEmpty() }
         .distinctUntilChanged()
         .flatMapLatest { text ->
             flow {
-                emit(NewConversationUiState.Loading)
+                emit(SearchUiState.Loading)
                 val token = tokenUseCase().firstOrNull()
-                if(token==null){
-                    emit(NewConversationUiState.Error(message = "Invalid Token"))
-                }
-                else{
-                    val result = newConversationRepository.searchUsers(query = text, token = token)
+                if (token == null) {
+                    emit(SearchUiState.Error(message = "Invalid Token"))
+                } else {
+                    val searchUsersDetails = SearchUsersDetails(query = text, token = token)
+                    val result = userRepository.searchUsers(searchUsersDetails = searchUsersDetails)
                     val state = when (result) {
                         is Result.Success -> {
                             if (result.data != null) {
-                                NewConversationUiState.Result(users = result.data.users)
+                                SearchUiState.Result(users = result.data.users)
                             } else {
-                                NewConversationUiState.Error(message = "No User Found")
+                                SearchUiState.Error(message = "No User Found")
                             }
                         }
-                        is Result.Error -> NewConversationUiState.Error(
+
+                        is Result.Error -> SearchUiState.Error(
                             message = result.message ?: "Something Went Wrong"
                         )
                     }
@@ -62,11 +67,7 @@ class NewConversationViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = NewConversationUiState.Idle
+            initialValue = SearchUiState.Idle
         )
-
-    fun onQueryChange(newQuery: String) {
-        _query.value = newQuery
-    }
 
 }

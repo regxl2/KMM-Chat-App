@@ -1,15 +1,10 @@
 package org.example.project.kmmchat.domain.repository
 
-import androidx.datastore.preferences.core.stringPreferencesKey
-import kotlinx.coroutines.flow.Flow
+import org.example.project.kmmchat.domain.model.SearchUsersDetails
+import org.example.project.kmmchat.domain.model.Users
+import org.example.project.kmmchat.util.Result
 
 interface UserRepository {
-    companion object{
-        val TOKEN = stringPreferencesKey("token")
-        val USER_ID = stringPreferencesKey("user_d")
-    }
-    suspend fun setToken(token: String?)
-    suspend fun setUserId(userId: String?)
-    fun getToken(): Flow<String?>
-    fun getUserId(): Flow<String?>
+    suspend fun searchUsers(searchUsersDetails: SearchUsersDetails): Result<Users>
+    suspend fun searchForAddingRoomUsers(searchUsersDetails: SearchUsersDetails): Result<Users>
 }

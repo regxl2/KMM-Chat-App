@@ -11,7 +11,6 @@ import Shared
 
 class ConversationsViewModelAdapter: ObservableObject {
     private let viewModel: ConversationsViewModel = ViewModelProvider.shared.conversationsViewModel
-    @Published var userId: String = ""
     @Published var isLoading: Bool = false
     @Published var error: String? = nil
     @Published var conversationsUi: ConversationsUI = ConversationsUI(conversations: [])
@@ -23,13 +22,6 @@ class ConversationsViewModelAdapter: ObservableObject {
     @MainActor
     func startObserving() async{
         await withTaskGroup(of: Void.self){ group in
-            group.addTask {
-                for await userId in self.viewModel.userId{
-                    await MainActor.run{
-                        self.userId = userId
-                    }
-                }
-            }
             group.addTask {
                 for await isLoading in self.viewModel.isLoading{
                     await MainActor.run{

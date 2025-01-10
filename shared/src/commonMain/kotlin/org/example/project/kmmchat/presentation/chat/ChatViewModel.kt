@@ -15,7 +15,7 @@ import org.example.project.kmmchat.domain.model.MessageRequest
 import org.example.project.kmmchat.domain.repository.ChatRepository
 import org.example.project.kmmchat.domain.usecase.GetTokenUseCase
 import org.example.project.kmmchat.domain.usecase.GetUserIdUseCase
-import org.example.project.kmmchat.presentation.conversations.toMessageResponseUI
+import org.example.project.kmmchat.presentation.common.toMessageResponseUIForChatUi
 import org.example.project.kmmchat.util.ChatType
 import org.example.project.kmmchat.util.ContentType
 import org.example.project.kmmchat.util.Result
@@ -80,12 +80,11 @@ class ChatViewModel(
         viewModelScope.launch {
             getUserIdUseCase().flatMapLatest { userId ->
                 if (userId != null) {
-                    chatRepository.getMessages(userId = userId).map { it.toMessageResponseUI() }
+                    chatRepository.getMessages(userId = userId).map { it.toMessageResponseUIForChatUi() }
                 } else {
                     flowOf()
                 }
             }.collect { message ->
-                println(message)
                 _chat.value = _chat.value.copy(messages = _chat.value.messages + message)
             }
         }
@@ -108,7 +107,7 @@ class ChatViewModel(
                 }
                 is Result.Success -> {
                     if (result.data != null) {
-                        _chat.value = _chat.value.copy(messages = result.data.map { it.toMessageResponseUI() })
+                        _chat.value = _chat.value.copy(messages = result.data.map { it.toMessageResponseUIForChatUi() })
                     }
                     else{
                         _error.value = "No messages"

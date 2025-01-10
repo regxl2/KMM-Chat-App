@@ -12,22 +12,16 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import org.example.project.kmmchat.data.remote.auth_data_source.dto.AccountVerificationDto
+import org.example.project.kmmchat.data.remote.auth_data_source.dto.ChangePasswordDto
 import org.example.project.kmmchat.data.remote.auth_data_source.dto.ForgotPasswordDto
+import org.example.project.kmmchat.data.remote.auth_data_source.dto.PassResetVerificationDto
 import org.example.project.kmmchat.data.remote.auth_data_source.dto.ResendOtpDto
-import org.example.project.kmmchat.data.remote.auth_data_source.dto.ResponseDto
+import org.example.project.kmmchat.data.remote.common_dto.ResponseDto
+import org.example.project.kmmchat.data.remote.auth_data_source.dto.SignInBodyDto
+import org.example.project.kmmchat.data.remote.auth_data_source.dto.SignUpBodyDto
 import org.example.project.kmmchat.data.remote.auth_data_source.dto.TokenDto
-import org.example.project.kmmchat.data.remote.auth_data_source.dto.toAccountVerificationDto
-import org.example.project.kmmchat.data.remote.auth_data_source.dto.toChangePasswordDto
-import org.example.project.kmmchat.data.remote.auth_data_source.dto.toPassResetVerificationDto
-import org.example.project.kmmchat.data.remote.auth_data_source.dto.toSignInBodyDto
-import org.example.project.kmmchat.data.remote.auth_data_source.dto.toSignUpDto
 import org.example.project.kmmchat.data.remote.common_dto.ErrorDto
-import org.example.project.kmmchat.domain.model.ChangePasswordDetails
-import org.example.project.kmmchat.domain.model.OtpDetails
-import org.example.project.kmmchat.domain.model.ResendOtpDetails
-import org.example.project.kmmchat.domain.model.ResendOtpType
-import org.example.project.kmmchat.domain.model.SignInBody
-import org.example.project.kmmchat.domain.model.SignUpBody
 import org.example.project.kmmchat.util.Result
 
 class RemoteAuthDataSource(
@@ -48,18 +42,16 @@ class RemoteAuthDataSource(
         return getResult(httpResponse = httpResponse)
     }
 
-    suspend fun signUp(details: SignUpBody): Result<ResponseDto> {
-        val signUpDetails = details.toSignUpDto();
+    suspend fun signUp(details: SignUpBodyDto): Result<ResponseDto> {
         return request(
             httpClient = httpClient,
             authUrl = authUrl,
             pathSegments = listOf("signup"),
-            body = signUpDetails
+            body = details
         )
     }
 
-    suspend fun accountVerification(otpDetails: OtpDetails): Result<ResponseDto> {
-        val accountVerificationDetails = otpDetails.toAccountVerificationDto()
+    suspend fun accountVerification(accountVerificationDetails: AccountVerificationDto): Result<ResponseDto> {
         return request(
             httpClient = httpClient,
             authUrl = authUrl,
@@ -68,27 +60,22 @@ class RemoteAuthDataSource(
         )
     }
 
-    suspend fun resendOtp(resendOtpDetails: ResendOtpDetails): Result<ResponseDto> {
-        val (email, type) = resendOtpDetails
-        val otpDetails = ResendOtpDto(email = email)
-        val pathSegment = if (type == ResendOtpType.ACCOUNT_VERIFICATION) "resend-otp-signup"
-        else "resend-otp-pass"
+    suspend fun resendOtp(pathSegment: String, resendOtpDto: ResendOtpDto): Result<ResponseDto> {
         return request(
             httpClient = httpClient,
             authUrl = authUrl,
             pathSegments = listOf(pathSegment),
-            body = otpDetails
+            body = resendOtpDto
         )
     }
 
-    suspend fun signIn(signInBody: SignInBody): Result<TokenDto> {
-        val signInDetails = signInBody.toSignInBodyDto()
+    suspend fun signIn(signInBodyDto: SignInBodyDto): Result<TokenDto> {
         val httpResponse = httpClient.post(urlString = authUrl) {
             url {
                 appendPathSegments("login")
             }
             contentType(ContentType.Application.Json)
-            setBody(signInDetails)
+            setBody(signInBodyDto)
         }
         return if (httpResponse.status.isSuccess()) {
             val success = httpResponse.body<TokenDto>()
@@ -109,18 +96,16 @@ class RemoteAuthDataSource(
         )
     }
 
-    suspend fun passResetVerification(otpDetails: OtpDetails): Result<ResponseDto> {
-        val passResetDetails = otpDetails.toPassResetVerificationDto()
+    suspend fun passResetVerification(passResetDto: PassResetVerificationDto): Result<ResponseDto> {
         return request(
             httpClient = httpClient,
             authUrl = authUrl,
             pathSegments = listOf("verify-reset-otp"),
-            body = passResetDetails
+            body = passResetDto
         )
     }
 
-    suspend fun changePassword(changePasswordDetails: ChangePasswordDetails): Result<ResponseDto> {
-        val changePasswordDto = changePasswordDetails.toChangePasswordDto()
+    suspend fun changePassword(changePasswordDto: ChangePasswordDto): Result<ResponseDto> {
         return request(
             httpClient = httpClient,
             authUrl = authUrl,

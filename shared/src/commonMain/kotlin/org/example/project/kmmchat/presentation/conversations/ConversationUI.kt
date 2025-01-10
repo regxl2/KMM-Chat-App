@@ -1,6 +1,8 @@
 package org.example.project.kmmchat.presentation.conversations
 
 import org.example.project.kmmchat.domain.model.Conversation
+import org.example.project.kmmchat.presentation.common.MessageResponseUI
+import org.example.project.kmmchat.presentation.common.toMessageResponseUIForConversationUi
 import org.example.project.kmmchat.util.ChatType
 
 data class ConversationUI(
@@ -10,11 +12,11 @@ data class ConversationUI(
     val name: String
 )
 
-fun Conversation.toConversationUI(): ConversationUI{
+fun Conversation.toConversationUI(userId: String): ConversationUI{
     return ConversationUI(
         conversationId = conversationId,
         conversationType = if(conversationType == "chat") ChatType.CHAT else ChatType.ROOM,
-        messageResponse = messageResponse?.toMessageResponseUI(),
+        messageResponse = messageResponse?.toMessageResponseUIForConversationUi(userId = userId),
         name = name
     )
 }

@@ -1,4 +1,4 @@
-package org.example.project.kmmchat.presentation.conversations
+package org.example.project.kmmchat.presentation.common
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -16,10 +16,22 @@ data class MessageResponseUI(
     val senderName: String
 )
 
-fun MessageResponse.toMessageResponseUI(): MessageResponseUI{
+fun MessageResponse.toMessageResponseUIForChatUi(): MessageResponseUI {
     return MessageResponseUI(
         id = id,
         content = content,
+        contentType = if(contentType == "text") ContentType.TEXT else ContentType.IMAGE,
+        createdAt = createdAt.convertToDate(),
+        senderId = senderId,
+        senderName = senderName,
+        isMine = isMine
+    )
+}
+
+fun MessageResponse.toMessageResponseUIForConversationUi(userId: String): MessageResponseUI {
+    return MessageResponseUI(
+        id = id,
+        content = if(senderName == userId) "You: $content" else "$senderName: $content",
         contentType = if(contentType == "text") ContentType.TEXT else ContentType.IMAGE,
         createdAt = createdAt.convertToDate(),
         senderId = senderId,

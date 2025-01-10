@@ -9,11 +9,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import org.example.project.kmmchat.presentation.add_room_members.AddGroupMember
 import org.example.project.kmmchat.presentation.auth.authNav
 import org.example.project.kmmchat.presentation.chat.Chat
 import org.example.project.kmmchat.presentation.conversations.Conversations
 import org.example.project.kmmchat.presentation.loading.Loading
 import org.example.project.kmmchat.presentation.new_conversation.NewConversation
+import org.example.project.kmmchat.presentation.new_room.NewRoom
 import org.example.project.kmmchat.util.ChatType
 import org.example.project.kmmchat.util.Destination
 
@@ -38,6 +40,7 @@ fun MainNavigation(destination: Destination, userId: String) {
             exitTransition = { exitTransition() }) {
             Conversations(
                 onNewConversationClick = { navController.navigate(NavRoutes.NewConversation) },
+                onClickNewRoom = { navController.navigate(NavRoutes.NewGroup) },
                 onConversationClick = { conversationId: String, conversationType: ChatType, name: String ->
                     navController.navigate(
                         NavRoutes.Chat(
@@ -60,7 +63,9 @@ fun MainNavigation(destination: Destination, userId: String) {
                 conversationId = chat.conversationId,
                 conversationType = if (chat.conversationType == "chat") ChatType.CHAT else ChatType.ROOM,
                 name = chat.name,
-                onNavigateBack = { navController.popBackStack() })
+                onNavigateBack = { navController.popBackStack() },
+                onClickAddGroupMember = { navController.navigate(NavRoutes.AddGroupMember(conversationId = chat.conversationId)) }
+            )
         }
 
         composable<NavRoutes.NewConversation>(
@@ -78,6 +83,18 @@ fun MainNavigation(destination: Destination, userId: String) {
                     )
                 }
             )
+        }
+
+        composable<NavRoutes.NewGroup> {
+            NewRoom(
+                onNavigateBack = {navController.popBackStack()}
+            )
+        }
+
+        composable<NavRoutes.AddGroupMember> {
+            navBackStack ->
+            val conversationId = navBackStack.toRoute<NavRoutes.AddGroupMember>().conversationId
+            AddGroupMember(conversationId = conversationId, onNavigateBack = {navController.popBackStack()})
         }
     }
 }
