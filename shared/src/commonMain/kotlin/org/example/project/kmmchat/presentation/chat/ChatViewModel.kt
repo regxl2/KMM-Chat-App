@@ -13,8 +13,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.example.project.kmmchat.domain.model.MessageRequest
 import org.example.project.kmmchat.domain.repository.ChatRepository
-import org.example.project.kmmchat.domain.usecase.GetTokenUseCase
-import org.example.project.kmmchat.domain.usecase.GetUserIdUseCase
+import org.example.project.kmmchat.domain.repository.CredentialsRepository
 import org.example.project.kmmchat.presentation.common.toMessageResponseUIForChatUi
 import org.example.project.kmmchat.util.ChatType
 import org.example.project.kmmchat.util.ContentType
@@ -22,8 +21,7 @@ import org.example.project.kmmchat.util.Result
 
 class ChatViewModel(
     private val chatRepository: ChatRepository,
-    private val getTokenUseCase: GetTokenUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val credentialsRepository: CredentialsRepository
 ) : ViewModel() {
 
     private val _chat =
@@ -58,7 +56,7 @@ class ChatViewModel(
 
     fun sendMessage() {
         viewModelScope.launch {
-            val token = getTokenUseCase().firstOrNull() ?: return@launch
+            val token = credentialsRepository.getToken().firstOrNull() ?: return@launch
             val result = chatRepository.sendMessage(
                 messageRequest = MessageRequest(
                     token = token,
@@ -78,7 +76,7 @@ class ChatViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     fun observeMessages() {
         viewModelScope.launch {
-            getUserIdUseCase().flatMapLatest { userId ->
+            credentialsRepository.getUserId().flatMapLatest { userId ->
                 if (userId != null) {
                     chatRepository.getMessages(userId = userId).map { it.toMessageResponseUIForChatUi() }
                 } else {
@@ -94,7 +92,7 @@ class ChatViewModel(
         viewModelScope.launch {
             _loading.value = true
             _error.value = null
-            val token = getTokenUseCase().firstOrNull()
+            val token = credentialsRepository.getToken().firstOrNull()
             if(token == null){
                 _loading.value = false
                 _error.value = "Invalid Credential"

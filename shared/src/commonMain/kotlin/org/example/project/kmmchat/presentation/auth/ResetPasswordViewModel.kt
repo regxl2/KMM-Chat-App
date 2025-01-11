@@ -5,10 +5,10 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.example.project.kmmchat.domain.repository.AuthRepository
 import org.example.project.kmmchat.util.Result
-import org.example.project.kmmchat.domain.usecase.ChangePasswordUseCase
 
-class ResetPasswordViewModel(private val changePasswordUseCase: ChangePasswordUseCase) :
+class ResetPasswordViewModel(private val authRepository: AuthRepository) :
     ViewModel() {
     private var email: String = ""
 
@@ -27,7 +27,7 @@ class ResetPasswordViewModel(private val changePasswordUseCase: ChangePasswordUs
     )
     val resetPasswordUiState = _resetPasswordUiState.asStateFlow()
 
-    fun resetNavigate(){
+    fun resetNavigate() {
         _resetPasswordUiState.value = ResetPasswordUi(
             password = "",
             confirmPassword = "",
@@ -52,34 +52,26 @@ class ResetPasswordViewModel(private val changePasswordUseCase: ChangePasswordUs
                 _resetPasswordUiState.value.copy(error = "Passwords are not matching")
             return
         }
-        _resetPasswordUiState.value =
-            _resetPasswordUiState.value.copy(isLoading = true, error = null)
         viewModelScope.launch {
-            try {
-                val changePasswordDetails =
-                    resetPasswordUiState.value.toChangePasswordDetails(email)
-                when (val result = changePasswordUseCase(changePasswordDetails)) {
-                    is Result.Success -> {
-                        _resetPasswordUiState.value = _resetPasswordUiState.value.copy(
-                            isLoading = false,
-                            error = null,
-                            navigate = true
-                        )
-                    }
-
-                    is Result.Error -> {
-                        _resetPasswordUiState.value = _resetPasswordUiState.value.copy(
-                            isLoading = false,
-                            error = result.message
-                        )
-                    }
+            _resetPasswordUiState.value =
+                _resetPasswordUiState.value.copy(isLoading = true, error = null)
+            val changePasswordDetails =
+                resetPasswordUiState.value.toChangePasswordDetails(email)
+            when (val result = authRepository.changePassword(changePasswordDetails)) {
+                is Result.Success -> {
+                    _resetPasswordUiState.value = _resetPasswordUiState.value.copy(
+                        isLoading = false,
+                        error = null,
+                        navigate = true
+                    )
                 }
-            } catch (e: Exception) {
-                _resetPasswordUiState.value = _resetPasswordUiState.value.copy(
-                    isLoading = false,
-                    error = "An unexpected error occurred. Please try again."
-                )
-                println(e.message)
+
+                is Result.Error -> {
+                    _resetPasswordUiState.value = _resetPasswordUiState.value.copy(
+                        isLoading = false,
+                        error = result.message
+                    )
+                }
             }
         }
     }

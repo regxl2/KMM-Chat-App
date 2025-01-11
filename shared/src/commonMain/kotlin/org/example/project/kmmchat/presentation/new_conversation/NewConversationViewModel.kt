@@ -16,14 +16,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import org.example.project.kmmchat.domain.model.SearchUsersDetails
+import org.example.project.kmmchat.domain.repository.CredentialsRepository
 import org.example.project.kmmchat.domain.repository.UserRepository
-import org.example.project.kmmchat.domain.usecase.GetTokenUseCase
 import org.example.project.kmmchat.presentation.common.SearchUiState
 import org.example.project.kmmchat.util.Result
 
 class NewConversationViewModel(
     private val userRepository: UserRepository,
-    private val tokenUseCase: GetTokenUseCase
+    private val credentialsRepository: CredentialsRepository
 ) : ViewModel() {
 
     private val _query = MutableStateFlow("")
@@ -41,7 +41,7 @@ class NewConversationViewModel(
         .flatMapLatest { text ->
             flow {
                 emit(SearchUiState.Loading)
-                val token = tokenUseCase().firstOrNull()
+                val token = credentialsRepository.getToken().firstOrNull()
                 if (token == null) {
                     emit(SearchUiState.Error(message = "Invalid Token"))
                 } else {

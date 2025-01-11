@@ -9,16 +9,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
-import org.example.project.kmmchat.domain.usecase.AuthenticateUseCase
-import org.example.project.kmmchat.domain.usecase.GetTokenUseCase
-import org.example.project.kmmchat.domain.usecase.SetUserIdUseCase
+import org.example.project.kmmchat.domain.repository.AuthRepository
+import org.example.project.kmmchat.domain.repository.CredentialsRepository
 import org.example.project.kmmchat.util.Destination
 import org.example.project.kmmchat.util.Result
 
 class MainViewModel(
-    getTokenUseCase: GetTokenUseCase,
-    setUserIdUseCase: SetUserIdUseCase,
-    authenticateUseCase: AuthenticateUseCase
+    private val authRepository: AuthRepository,
+    private val credentialsRepository: CredentialsRepository
 ) :
     ViewModel() {
 
@@ -26,17 +24,17 @@ class MainViewModel(
     val userId = _userId.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val destination = getTokenUseCase().flatMapLatest { value: String? ->
+    val destination = credentialsRepository.getToken().flatMapLatest { value: String? ->
         flow {
             if (value == null) {
                 emit(Destination.AUTH)
             } else {
                 try {
-                    val result = authenticateUseCase(value)
+                    val result = authRepository.authenticate(value)
                     emit(
                         when (result) {
                             is Result.Success -> {
-                                setUserIdUseCase(userId = result.data?.message)
+                                credentialsRepository.setUserId(userId = result.data?.message)
                                 _userId.value = result.data?.message.toString()
                                 Destination.CONVERSATIONS
                             }

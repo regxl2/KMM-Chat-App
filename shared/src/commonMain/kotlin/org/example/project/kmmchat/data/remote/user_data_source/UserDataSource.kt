@@ -12,6 +12,7 @@ import org.example.project.kmmchat.data.remote.common_dto.ErrorDto
 import org.example.project.kmmchat.data.remote.user_data_source.dto.AddUsersDto
 import org.example.project.kmmchat.data.remote.user_data_source.dto.UsersDto
 import org.example.project.kmmchat.util.Result
+import org.example.project.kmmchat.util.runSafely
 
 class UserDataSource(
     private val httpClient: HttpClient,
@@ -20,7 +21,7 @@ class UserDataSource(
     private val apiUrl = "$url/user"
 
     suspend fun searchUsers(query: String, token: String): Result<UsersDto>{
-        return try{
+        return runSafely {
             val response = httpClient.get(urlString = apiUrl){
                 url {
                     appendPathSegments("search")
@@ -32,19 +33,14 @@ class UserDataSource(
             }
             if(response.status.isSuccess()){
                 Result.Success(data = response.body<UsersDto>())
-            }
-            else {
+            } else {
                 Result.Error(message = response.body<ErrorDto>().error)
             }
-        }
-        catch (e: Exception){
-            e.printStackTrace()
-            Result.Error(message = e.message)
         }
     }
 
     suspend fun searchWithoutRoomUsers(conversationId:String, query: String, token: String): Result<AddUsersDto>{
-        return try{
+        return runSafely {
             val response = httpClient.get(urlString = apiUrl){
                 url {
                     appendPathSegments("search-room-users")
@@ -57,14 +53,9 @@ class UserDataSource(
             }
             if(response.status.isSuccess()){
                 Result.Success(data = response.body<AddUsersDto>())
-            }
-            else {
+            } else {
                 Result.Error(message = response.body<ErrorDto>().error)
             }
-        }
-        catch (e: Exception){
-            e.printStackTrace()
-            Result.Error(message = e.message)
         }
     }
 

@@ -8,10 +8,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.example.project.kmmchat.domain.repository.AuthRepository
 import org.example.project.kmmchat.util.Result
-import org.example.project.kmmchat.domain.usecase.SignUpUseCase
 
-class SignUpViewModel(private val signUpUseCase: SignUpUseCase) : ViewModel() {
+class SignUpViewModel(private val authRepository: AuthRepository) : ViewModel() {
     private var _signUpUiState = MutableStateFlow(
         SignUpUi(
             name = "",
@@ -36,29 +36,21 @@ class SignUpViewModel(private val signUpUseCase: SignUpUseCase) : ViewModel() {
         val signUpDetails = signUpUiState.value.toSignUpBody()
         _signUpUiState.value = _signUpUiState.value.copy(isLoading = true, error = null)
         viewModelScope.launch {
-            try {
-                when (val result = signUpUseCase(signUpDetails)) {
-                    is Result.Success -> {
-                        if (result.data != null) {
-                            _signUpUiState.value = _signUpUiState.value.copy(
-                                isLoading = false,
-                                navigateToOtp = true
-                            )
-                        } else {
-                            throw Exception()
-                        }
-                    }
-                    is Result.Error -> {
-                        _signUpUiState.value =
-                            _signUpUiState.value.copy(isLoading = false, error = result.message)
+            when (val result = authRepository.signUp(signUpDetails)) {
+                is Result.Success -> {
+                    if (result.data != null) {
+                        _signUpUiState.value = _signUpUiState.value.copy(
+                            isLoading = false,
+                            navigateToOtp = true
+                        )
+                    } else {
+                        throw Exception()
                     }
                 }
-            } catch (e: Exception) {
-                _signUpUiState.value = _signUpUiState.value.copy(
-                    isLoading = false,
-                    error = "An unexpected error occurred. Please try again."
-                )
-                println(e.message)
+                is Result.Error -> {
+                    _signUpUiState.value =
+                        _signUpUiState.value.copy(isLoading = false, error = result.message)
+                }
             }
         }
     }

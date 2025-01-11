@@ -8,29 +8,53 @@
 
 import SwiftUI
 
-struct CircularIndicatorBox<Content: View>: View{
+//struct CircularIndicatorBox<Content: View>: View{
+//    let isLoading: Bool
+//    let content: Content
+//    
+//    init(isLoading: Bool, content: ()-> Content) {
+//        self.isLoading = isLoading
+//        self.content = content()
+//    }
+//    
+//    var body: some View{
+//        ZStack{
+//            content
+//            if(isLoading){
+//                VStack{
+//                    ProgressView()
+//                        .frame(width: 64, height: 64)
+//                }
+//                .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                .background(Color.white.opacity(0.5))
+//            }
+//        }
+//        .padding()
+//        .frame(maxWidth: .infinity, maxHeight: .infinity)
+//    }
+//    
+//}
+
+struct CircularIndicatorBox<Content: View>: View {
     let isLoading: Bool
-    let content: Content
+    let content: () -> Content
     
-    init(isLoading: Bool, content: ()-> Content) {
+    init(isLoading: Bool, @ViewBuilder content: @escaping () -> Content) {
         self.isLoading = isLoading
-        self.content = content()
+        self.content = content
     }
     
-    var body: some View{
-        ZStack{
-            content
-            if(isLoading){
-                VStack{
-                    ProgressView()
-                        .frame(width: 64, height: 64)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.white.opacity(0.5))
+    var body: some View {
+        ZStack {
+            content()
+            if isLoading {
+                Color.white
+                    .opacity(0.5)
+                    .ignoresSafeArea()
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .padding(16)
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    
 }

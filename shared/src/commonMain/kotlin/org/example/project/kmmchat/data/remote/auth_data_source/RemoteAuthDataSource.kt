@@ -17,12 +17,13 @@ import org.example.project.kmmchat.data.remote.auth_data_source.dto.ChangePasswo
 import org.example.project.kmmchat.data.remote.auth_data_source.dto.ForgotPasswordDto
 import org.example.project.kmmchat.data.remote.auth_data_source.dto.PassResetVerificationDto
 import org.example.project.kmmchat.data.remote.auth_data_source.dto.ResendOtpDto
-import org.example.project.kmmchat.data.remote.common_dto.ResponseDto
 import org.example.project.kmmchat.data.remote.auth_data_source.dto.SignInBodyDto
 import org.example.project.kmmchat.data.remote.auth_data_source.dto.SignUpBodyDto
 import org.example.project.kmmchat.data.remote.auth_data_source.dto.TokenDto
 import org.example.project.kmmchat.data.remote.common_dto.ErrorDto
+import org.example.project.kmmchat.data.remote.common_dto.ResponseDto
 import org.example.project.kmmchat.util.Result
+import org.example.project.kmmchat.util.runSafely
 
 class RemoteAuthDataSource(
     private val httpClient: HttpClient,
@@ -70,19 +71,21 @@ class RemoteAuthDataSource(
     }
 
     suspend fun signIn(signInBodyDto: SignInBodyDto): Result<TokenDto> {
-        val httpResponse = httpClient.post(urlString = authUrl) {
-            url {
-                appendPathSegments("login")
+        return org.example.project.kmmchat.util.runSafely {
+            val httpResponse = httpClient.post(urlString = authUrl) {
+                url {
+                    appendPathSegments("login")
+                }
+                contentType(ContentType.Application.Json)
+                setBody(signInBodyDto)
             }
-            contentType(ContentType.Application.Json)
-            setBody(signInBodyDto)
-        }
-        return if (httpResponse.status.isSuccess()) {
-            val success = httpResponse.body<TokenDto>()
-            Result.Success(data = success)
-        } else {
-            val errorMessage = httpResponse.body<ErrorDto>().error
-            Result.Error(message = errorMessage)
+            if (httpResponse.status.isSuccess()) {
+                val success = httpResponse.body<TokenDto>()
+                Result.Success(data = success)
+            } else {
+                val errorMessage = httpResponse.body<ErrorDto>().error
+                Result.Error(message = errorMessage)
+            }
         }
     }
 
@@ -120,7 +123,6 @@ class RemoteAuthDataSource(
             Result.Success(data = success)
         } else {
             val errorMessage = httpResponse.body<ErrorDto>().error
-            println(errorMessage)
             Result.Error(message = errorMessage)
         }
     }
@@ -131,7 +133,7 @@ class RemoteAuthDataSource(
         pathSegments: List<String>,
         body: T
     ): Result<ResponseDto> {
-        return try{
+        return runSafely {
             val httpResponse = httpClient.post(urlString = authUrl) {
                 url {
                     appendPathSegments(pathSegments)
@@ -139,11 +141,7 @@ class RemoteAuthDataSource(
                 contentType(ContentType.Application.Json)
                 setBody(body)
             }
-            return getResult(httpResponse = httpResponse)
-        }
-        catch (e: Exception){
-            e.printStackTrace()
-            Result.Error(message = e.message)
+            getResult(httpResponse = httpResponse)
         }
     }
 }

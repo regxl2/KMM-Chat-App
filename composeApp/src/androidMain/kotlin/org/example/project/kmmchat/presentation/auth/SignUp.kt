@@ -25,6 +25,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -102,7 +103,7 @@ fun SignUp(
             )
             signUpUiState.error?.let {
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    Text(modifier = Modifier.align(Alignment.Center), text = it, color = Color.Red)
+                    Text(modifier = Modifier.align(Alignment.Center), text = it, color = Color.Red, textAlign = TextAlign.Center)
                 }
             }
             Button(

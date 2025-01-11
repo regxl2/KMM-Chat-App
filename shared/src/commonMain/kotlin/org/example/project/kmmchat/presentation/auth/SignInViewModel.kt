@@ -8,13 +8,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.example.project.kmmchat.domain.repository.AuthRepository
+import org.example.project.kmmchat.domain.repository.CredentialsRepository
 import org.example.project.kmmchat.util.Result
-import org.example.project.kmmchat.domain.usecase.SetTokenUseCase
-import org.example.project.kmmchat.domain.usecase.SignInUseCase
 
 class SignInViewModel(
-    private val signInUseCase: SignInUseCase,
-    private val setTokenUseCase: SetTokenUseCase
+    private val authRepository: AuthRepository,
+    private val credentialsRepository: CredentialsRepository
 ) : ViewModel() {
     private var _signInUiState = MutableStateFlow(
         SignInUi(
@@ -36,37 +36,28 @@ class SignInViewModel(
     )
 
     fun signIn() {
-        _signInUiState.value = _signInUiState.value.copy(isLoading = true, error = null)
-        val signInBody = _signInUiState.value.toSignInBody()
         viewModelScope.launch {
-            try {
-                when (val result = signInUseCase(signInBody = signInBody)) {
-                    is Result.Success -> {
-                       if(result.data == null) throw NoSuchElementException()
-                        setTokenUseCase(result.data.token)
-                        println(result.data.token)
-                        _signInUiState.value = _signInUiState.value.copy(
-                            navigate = true,
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-
-                    is Result.Error -> {
-                        _signInUiState.value =
-                            _signInUiState.value.copy(
-                                navigate = false,
-                                isLoading = false,
-                                error = result.message
-                            )
-                    }
+            _signInUiState.value = _signInUiState.value.copy(isLoading = true, error = null)
+            val signInBody = _signInUiState.value.toSignInBody()
+            when (val result = authRepository.signIn(signInBody = signInBody)) {
+                is Result.Success -> {
+                    if (result.data == null) throw NoSuchElementException()
+                    credentialsRepository.setUserId(result.data.token)
+                    _signInUiState.value = _signInUiState.value.copy(
+                        navigate = true,
+                        isLoading = false,
+                        error = null
+                    )
                 }
-            } catch (e: Exception) {
-                _signInUiState.value = _signInUiState.value.copy(
-                    isLoading = false,
-                    error = "An unexpected error occurred. Please try again."
-                )
-                println(e.message)
+
+                is Result.Error -> {
+                    _signInUiState.value =
+                        _signInUiState.value.copy(
+                            navigate = false,
+                            isLoading = false,
+                            error = result.message
+                        )
+                }
             }
         }
     }

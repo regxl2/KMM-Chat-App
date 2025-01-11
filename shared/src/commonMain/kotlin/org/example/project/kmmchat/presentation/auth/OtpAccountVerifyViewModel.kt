@@ -7,13 +7,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.example.project.kmmchat.domain.model.ResendOtpDetails
 import org.example.project.kmmchat.domain.model.ResendOtpType
+import org.example.project.kmmchat.domain.repository.AuthRepository
 import org.example.project.kmmchat.util.Result
-import org.example.project.kmmchat.domain.usecase.AccountVerificationUseCase
-import org.example.project.kmmchat.domain.usecase.ResendOtpUseCase
 
 class OtpAccountVerifyViewModel(
-    private val accountVerificationUseCase: AccountVerificationUseCase,
-    private val resendOtpUseCase: ResendOtpUseCase
+    private val authRepository: AuthRepository
 ) : ViewModel() {
     private var email = ""
     private var _otpUiState =
@@ -34,60 +32,45 @@ class OtpAccountVerifyViewModel(
         }
         viewModelScope.launch {
             _otpUiState.value = _otpUiState.value.copy(isLoading = true, error = null)
-            try {
-                val otpDetails = _otpUiState.value.toOtpDetails(email = email)
-                when (val result = accountVerificationUseCase(otpDetails)) {
-                    is Result.Success -> {
-                        _otpUiState.value = _otpUiState.value.copy(
-                            navigateScreen = true,
-                            isLoading = false,
-                            error = null
-                        )
-                        println(result.message)
-                    }
-
-                    is Result.Error -> {
-                        _otpUiState.value =
-                            _otpUiState.value.copy(isLoading = false, error = result.message)
-                    }
+            val otpDetails = _otpUiState.value.toOtpDetails(email = email)
+            when (val result = authRepository.accountVerification(otpDetails)) {
+                is Result.Success -> {
+                    _otpUiState.value = _otpUiState.value.copy(
+                        navigateScreen = true,
+                        isLoading = false,
+                        error = null
+                    )
+                    println(result.message)
                 }
-            } catch (e: Exception) {
-                _otpUiState.value = _otpUiState.value.copy(
-                    isLoading = false,
-                    error = "An unexpected error occurred. Please try again"
-                )
-                println(e.message)
+
+                is Result.Error -> {
+                    _otpUiState.value =
+                        _otpUiState.value.copy(isLoading = false, error = result.message)
+                }
             }
         }
     }
 
     fun resendOtp() {
-        _otpUiState.value = _otpUiState.value.copy(isLoading = true, error = null)
         viewModelScope.launch {
-            try {
-                when (val result = resendOtpUseCase(
-                    ResendOtpDetails(
-                        email = email,
-                        type = ResendOtpType.ACCOUNT_VERIFICATION
-                    )
-                )) {
-                    is Result.Success -> {
-                        _otpUiState.value = _otpUiState.value.copy(
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-
-                    is Result.Error -> {
-                        _otpUiState.value =
-                            _otpUiState.value.copy(isLoading = false, error = result.message)
-                    }
-                }
-            } catch (e: Exception) {
-                _otpUiState.value = _otpUiState.value.copy(
-                    isLoading = false,
-                    error = "An unexpected error occurred. Please try again"
+            _otpUiState.value = _otpUiState.value.copy(isLoading = true, error = null)
+            when (val result = authRepository.resendOtp(
+                ResendOtpDetails(
+                    email = email,
+                    type = ResendOtpType.ACCOUNT_VERIFICATION
                 )
+            )) {
+                is Result.Success -> {
+                    _otpUiState.value = _otpUiState.value.copy(
+                        isLoading = false,
+                        error = null
+                    )
+                }
+
+                is Result.Error -> {
+                    _otpUiState.value =
+                        _otpUiState.value.copy(isLoading = false, error = result.message)
+                }
             }
         }
     }

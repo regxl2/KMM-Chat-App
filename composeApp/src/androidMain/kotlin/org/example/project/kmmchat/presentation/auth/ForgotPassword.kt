@@ -100,7 +100,7 @@ fun ForgotPassword(
             )
             error?.let {
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    Text(modifier = Modifier.align(Alignment.Center), text = it, color = Color.Red)
+                    Text(modifier = Modifier.align(Alignment.Center), text = it, color = Color.Red, textAlign = TextAlign.Center)
                 }
             }
             Button(

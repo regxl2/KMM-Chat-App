@@ -15,18 +15,6 @@ import org.example.project.kmmchat.domain.repository.ChatRepository
 import org.example.project.kmmchat.domain.repository.ConversationRepository
 import org.example.project.kmmchat.domain.repository.CredentialsRepository
 import org.example.project.kmmchat.domain.repository.UserRepository
-import org.example.project.kmmchat.domain.usecase.AccountVerificationUseCase
-import org.example.project.kmmchat.domain.usecase.AuthenticateUseCase
-import org.example.project.kmmchat.domain.usecase.ChangePasswordUseCase
-import org.example.project.kmmchat.domain.usecase.ForgotPasswordRequestUseCase
-import org.example.project.kmmchat.domain.usecase.GetTokenUseCase
-import org.example.project.kmmchat.domain.usecase.GetUserIdUseCase
-import org.example.project.kmmchat.domain.usecase.PassResetVerificationUseCase
-import org.example.project.kmmchat.domain.usecase.ResendOtpUseCase
-import org.example.project.kmmchat.domain.usecase.SetTokenUseCase
-import org.example.project.kmmchat.domain.usecase.SetUserIdUseCase
-import org.example.project.kmmchat.domain.usecase.SignInUseCase
-import org.example.project.kmmchat.domain.usecase.SignUpUseCase
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
@@ -84,19 +72,4 @@ val repositoryModule = module {
     singleOf(::UserRepositoryImpl).bind(UserRepository::class)
 }
 
-val useCaseModule = module {
-    factory { SignUpUseCase() }
-    factory { AccountVerificationUseCase() }
-    factory { ResendOtpUseCase() }
-    factory { SignInUseCase() }
-    factory { ForgotPasswordRequestUseCase() }
-    factory { PassResetVerificationUseCase() }
-    factory { ChangePasswordUseCase() }
-    factory { SetTokenUseCase() }
-    factory { GetTokenUseCase() }
-    factory { AuthenticateUseCase() }
-    factory { GetUserIdUseCase() }
-    factory { SetUserIdUseCase() }
-}
-
-fun getSharedModule() = listOf(dataSourceModule, repositoryModule, useCaseModule, utilityModule)
+fun getSharedModule() = listOf(dataSourceModule, repositoryModule, utilityModule)

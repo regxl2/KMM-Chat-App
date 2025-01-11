@@ -19,6 +19,7 @@ import org.example.project.kmmchat.data.remote.chat_data_source.dto.MessageReque
 import org.example.project.kmmchat.data.remote.common_dto.ErrorDto
 import org.example.project.kmmchat.data.remote.common_dto.ResponseDto
 import org.example.project.kmmchat.util.Result
+import org.example.project.kmmchat.util.runSafely
 
 class ChatDataSource(
     private val httpClient: HttpClient,
@@ -26,7 +27,7 @@ class ChatDataSource(
 ) {
     private val chatUrl = "$apiUrl/chat"
     suspend fun getInitialChatRoom(token: String, chatRequestDto: ChatRequestDto): Result<ChatResponseDto>{
-        return try{
+        return runSafely {
             val httpResponse =  httpClient.get(urlString = chatUrl){
                 url {
                     appendPathSegments("get-chat")
@@ -39,19 +40,14 @@ class ChatDataSource(
             }
             if(httpResponse.status.isSuccess()){
                 Result.Success(data = httpResponse.body<ChatResponseDto>())
-            }
-            else{
+            } else{
                 Result.Error(message = httpResponse.body<ErrorDto>().error)
             }
-        }
-        catch (e: Exception){
-            e.printStackTrace()
-            Result.Error(message = e.message)
         }
     }
 
     suspend fun sendMessage(token: String, messageRequestDto: MessageRequestDto): Result<ResponseDto>{
-        return try{
+        return runSafely {
             val httpResponse =  httpClient.post(urlString = chatUrl){
                 url{
                     appendPathSegments("send-message")
@@ -64,19 +60,14 @@ class ChatDataSource(
             }
             if (httpResponse.status.isSuccess()){
                 Result.Success(data = httpResponse.body<ResponseDto>())
-            }
-            else{
+            } else{
                 Result.Error(message = httpResponse.body<ErrorDto>().error)
             }
-        }
-        catch(e: Exception){
-            e.printStackTrace()
-            Result.Error(message = e.message)
         }
     }
 
     suspend fun searchForAddingRoomUsers(token: String, addRoomUserDetailsDto: AddRoomUserDetailsDto): Result<ResponseDto>{
-        return try{
+        return runSafely {
             val httpResponse = httpClient.post(urlString = chatUrl){
                 url{
                     appendPathSegments("add-room-user")
@@ -89,15 +80,9 @@ class ChatDataSource(
             }
             if(httpResponse.status.isSuccess()){
                 Result.Success(data = httpResponse.body<ResponseDto>())
-            }
-            else{
+            } else{
                 Result.Error(message = httpResponse.body<ErrorDto>().error)
             }
-        }
-        catch (e: Exception){
-            println("hello world")
-            e.printStackTrace()
-            Result.Error(message = e.message)
         }
     }
 }

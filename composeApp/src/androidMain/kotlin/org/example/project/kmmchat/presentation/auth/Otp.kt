@@ -177,7 +177,7 @@ fun Otp(
             Spacer(modifier = Modifier.height(16.dp))
             otpUiState.error?.let {
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    Text(modifier = Modifier.align(Alignment.Center), text = it, color = Color.Red)
+                    Text(modifier = Modifier.align(Alignment.Center), text = it, color = Color.Red, textAlign = TextAlign.Center)
                 }
             }
             Spacer(modifier = Modifier.height(32.dp))
