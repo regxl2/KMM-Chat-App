@@ -10,26 +10,33 @@ import SwiftUI
 import Shared
 
 struct ContentView: View {
-    @State private var navigation: Navigation = Navigation()
+    @StateObject private var navigation: Navigation = Navigation()
     @StateObject private var viewModelAdapter: ContentViewModelAdapter = ContentViewModelAdapter()
     
     var body: some View {
         NavigationStack(path: $navigation.navPath){
-            Group{
-                switch viewModelAdapter.rootScreen {
-                case .auth: content(route: NavRoutes.SignIn)
-                case .conversations: content(route: NavRoutes.Conversations)
-                case .loading: content(route: NavRoutes.Loading)
-                }
+            ZStack{
+                contentView()
             }
             .navigationDestination(for: NavRoutes.self){ route in
                 content(route: route)
             }
         }
-        .task {
+        .task{
             await viewModelAdapter.observeState()
         }
-        .environment(navigation)
+        .environmentObject(navigation)
         .environmentObject(viewModelAdapter)
+    }
+}
+
+extension ContentView {
+    @ViewBuilder
+    func contentView() -> some View {
+        switch viewModelAdapter.rootScreen {
+        case .auth: content(route: NavRoutes.SignIn)
+        case .conversations: content(route: NavRoutes.Conversations)
+        case .loading: content(route: NavRoutes.Loading)
+        }
     }
 }

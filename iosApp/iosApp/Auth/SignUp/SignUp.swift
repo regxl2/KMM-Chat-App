@@ -10,7 +10,8 @@ import SwiftUI
 
 struct SignUp: View{
     private let signUpViewModelAdapter: SignUpViewModelAdapter = SignUpViewModelAdapter()
-    @Environment(Navigation.self) private var navigation
+    @EnvironmentObject private var navigation: Navigation
+    @Environment(\.dismiss) var dismiss
     var body: some View{
         CircularIndicatorBox(isLoading: signUpViewModelAdapter.isLoading, content: {
             VStack(spacing: 16){
@@ -48,6 +49,7 @@ struct SignUp: View{
         .toolbar{
             ToolbarItem(placement: .navigationBarLeading){
                 BackButton{
+                    dismiss()
                     navigation.navigateBack()
                 }
             }
@@ -66,5 +68,5 @@ struct SignUp: View{
 
 #Preview {
     SignUp()
-        .environment(Navigation())
+        .environmentObject(Navigation())
 }

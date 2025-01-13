@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +53,10 @@ fun Conversations(
 
     var expanded by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) { 
+        viewModel.getConversationList()
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -76,7 +81,7 @@ fun Conversations(
                         ) {
                             DropdownMenuItem(
                                 text = {
-                                    Text(text = "New Group", textAlign = TextAlign.Center)
+                                    Text(text = "New Room", textAlign = TextAlign.Center)
                                 },
                                 onClick = {
                                     expanded = false

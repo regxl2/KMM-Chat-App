@@ -58,7 +58,7 @@ fun NewRoom(
             TopAppBar(
                 modifier = Modifier.shadow(4.dp),
                 title = {
-                    Text("New group")
+                    Text("New Room")
                 },
                 navigationIcon = {
                     IconButton(
@@ -75,7 +75,7 @@ fun NewRoom(
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.imePadding(),
-                onClick = viewModel::addRoomUser
+                onClick = viewModel::addRoom,
             ) {
                 Icon(imageVector = Icons.Default.Check, contentDescription = "Done")
             }

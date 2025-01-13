@@ -2,6 +2,7 @@ package org.example.project.kmmchat.presentation.conversations
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -24,10 +25,8 @@ class ConversationsViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error = _error.asStateFlow()
 
+    private var job: Job? = null
 
-    init {
-        getConversationList()
-    }
 
     fun logout(){
         viewModelScope.launch {
@@ -38,7 +37,8 @@ class ConversationsViewModel(
 
 
     fun getConversationList() {
-        viewModelScope.launch {
+        job?.cancel()
+        job = viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             val userId = credentialsRepository.getUserId().firstOrNull()
@@ -61,5 +61,16 @@ class ConversationsViewModel(
             }
             _isLoading.value = false
         }
+    }
+
+    fun clearStates(){
+        _error.value = null
+        _isLoading.value = false
+        _conversationUiState.value = ConversationsUI()
+    }
+
+    override fun onCleared() {
+        job?.cancel()
+        super.onCleared()
     }
 }

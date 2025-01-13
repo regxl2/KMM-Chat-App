@@ -32,7 +32,11 @@ class NewRoomViewModel(
         _navigate.value = false
     }
 
-    fun addRoomUser() {
+    fun addRoom() {
+        if (roomName.value.isEmpty()){
+            _error.value = "Please enter the room name"
+            return
+        }
         viewModelScope.launch {
             val token = credentialsRepository.getToken().firstOrNull()
             if(token==null){
@@ -48,5 +52,11 @@ class NewRoomViewModel(
                 }
             }
         }
+    }
+
+    fun clearStates(){
+        _navigate.value = false
+        _error.value = null
+        _roomName.value = ""
     }
 }

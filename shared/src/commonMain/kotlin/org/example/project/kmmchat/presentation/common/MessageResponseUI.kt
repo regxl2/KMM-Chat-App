@@ -46,7 +46,7 @@ fun String.convertToDate(): String{
         val localTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
         val hours = when(localTime.hour){
             0 -> 12
-            in 12..23 -> localTime.hour - 12
+            in 13..23 -> localTime.hour - 12
             else -> localTime.hour
         }
         val minutes = localTime.minute.toString().padStart(2, '0')

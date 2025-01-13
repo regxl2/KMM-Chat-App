@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SignIn: View{
     @StateObject private var viewModelAdapter: SignInViewModelAdpater = SignInViewModelAdpater()
-    @Environment(Navigation.self) private var navigation
+    @EnvironmentObject private var navigation: Navigation
     @EnvironmentObject private var iOSViewModelAdapter: ContentViewModelAdapter
     
     var body: some View{
@@ -66,6 +66,6 @@ struct SignIn: View{
 
 #Preview{
     SignIn()
-        .environment(Navigation())
+        .environmentObject(Navigation())
 }
 

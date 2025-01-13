@@ -82,10 +82,17 @@ class AddRoomMemberViewModel(
                                 })
                         }
                     }
-
                     is Result.Error -> {}
                 }
             }
         }
+    }
+
+    fun clearStates(){
+        job?.cancel()
+        job = null
+        _query.value = ""
+        conversationId = ""
+        _searchUiState.value = SearchUiState.Idle
     }
 }

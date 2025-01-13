@@ -7,10 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,7 +15,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.project.kmmchat.presentation.common.AvatarAlt
 import org.example.project.kmmchat.util.ChatType
+import java.util.Locale
 
 @Composable
 fun ConversationsItem(
@@ -41,16 +39,7 @@ fun ConversationsItem(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-//        Avatar(
-//            modifier = Modifier.size(50.dp),
-//            url = "https://i.pravatar.cc/150?u=1",
-//            contentDescription = conversation.name
-//        )
-        Icon(
-            modifier = Modifier.size(50.dp),
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "user profile"
-        )
+        AvatarAlt(text = conversation.name.substring(0, 1))
         Column(
             modifier = Modifier
                 .weight(1f)

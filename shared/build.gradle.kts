@@ -12,6 +12,9 @@ skie {
     features {
         enableSwiftUIObservingPreview = true
     }
+    features {
+        enableFlowCombineConvertorPreview = true
+    }
 }
 
 kotlin {
@@ -30,16 +33,25 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
+
+//            export(libs.mvvm.core)
+//            export(libs.mvvm.flow)
         }
     }
 
     sourceSets {
         androidMain.dependencies {
+//            api(libs.mvvm.core)
+//            api(libs.mvvm.flow)
+
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
             implementation(libs.ktor.client.okhttp)
         }
         commonMain.dependencies {
+
+//            implementation(libs.mvvm.core)
+//            implementation(libs.mvvm.flow)
             // put your Multiplatform dependencies here
             implementation(libs.kotlinx.datetime)
             implementation(libs.androidx.datastore.preferences.core)
@@ -52,6 +64,9 @@ kotlin {
             implementation(libs.kermit)
         }
         iosMain.dependencies {
+//            api(libs.mvvm.core)
+//            api(libs.mvvm.flow)
+
             implementation(libs.ktor.client.darwin)
         }
     }

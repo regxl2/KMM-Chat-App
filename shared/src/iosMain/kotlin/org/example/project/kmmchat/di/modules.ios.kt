@@ -9,6 +9,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.example.project.kmmchat.platform.createDataStore
 import org.example.project.kmmchat.presentation.MainViewModel
+import org.example.project.kmmchat.presentation.add_room_members.AddRoomMemberViewModel
 import org.example.project.kmmchat.presentation.auth.ForgotPasswordViewModel
 import org.example.project.kmmchat.presentation.auth.OtpAccountVerifyViewModel
 import org.example.project.kmmchat.presentation.auth.OtpPassVerifyViewModel
@@ -17,9 +18,10 @@ import org.example.project.kmmchat.presentation.auth.SignInViewModel
 import org.example.project.kmmchat.presentation.auth.SignUpViewModel
 import org.example.project.kmmchat.presentation.chat.ChatViewModel
 import org.example.project.kmmchat.presentation.conversations.ConversationsViewModel
+import org.example.project.kmmchat.presentation.new_conversation.NewConversationViewModel
+import org.example.project.kmmchat.presentation.new_room.NewRoomViewModel
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -27,6 +29,7 @@ import org.koin.dsl.module
 actual val utilityModule = module {
     single(qualifier = named(Qualifier.WEBSOCKET_URL)) { "ws://localhost:3001" }
     single(qualifier = named(Qualifier.API_URL)) { "http://localhost:8080/api/v1" }
+    single{ OS.IOS }
 }
 
 actual val platformModule = module {
@@ -50,17 +53,23 @@ actual val platformModule = module {
         createDataStore()
     }
     singleOf(::MainViewModel)
-    factoryOf(::SignInViewModel)
-    factoryOf(::SignUpViewModel)
-    factoryOf(::OtpAccountVerifyViewModel)
-    factoryOf(::ForgotPasswordViewModel)
-    factoryOf(::OtpPassVerifyViewModel)
-    factoryOf(::ResetPasswordViewModel)
-    factoryOf(::ConversationsViewModel)
-    factoryOf(::ChatViewModel)
+    singleOf(::SignInViewModel)
+    singleOf(::SignUpViewModel)
+    singleOf(::OtpAccountVerifyViewModel)
+    singleOf(::ForgotPasswordViewModel)
+    singleOf(::OtpPassVerifyViewModel)
+    singleOf(::ResetPasswordViewModel)
+    singleOf(::ConversationsViewModel)
+    singleOf(::ChatViewModel)
+    singleOf(::NewConversationViewModel)
+    singleOf(::NewRoomViewModel)
+    singleOf(::AddRoomMemberViewModel)
 }
 
 object ViewModelProvider : KoinComponent {
+    val addRoomMemberViewModel: AddRoomMemberViewModel by inject()
+    val newRoomViewModel: NewRoomViewModel by inject()
+    val newConversationViewModel: NewConversationViewModel by inject()
     val conversationsViewModel: ConversationsViewModel by inject()
     val chatViewModel: ChatViewModel by inject()
     val signInViewModel: SignInViewModel by inject()

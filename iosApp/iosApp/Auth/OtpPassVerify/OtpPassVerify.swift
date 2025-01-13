@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct OtpPassVerify: View {
-    @Environment(Navigation.self) private var navigation
+    @EnvironmentObject private var navigation: Navigation
+    @Environment(\.dismiss) var dismiss
     @StateObject private var viewModelAdapter: OtpPassVerifyViewModelAdapter = OtpPassVerifyViewModelAdapter()
     let email: String
     
@@ -32,7 +33,8 @@ struct OtpPassVerify: View {
         .toolbar{
             ToolbarItem(placement: .navigationBarLeading){
                 BackButton{
-                    navigation.navigateBack()
+                    dismiss()
+                    navigation.popBackStack()
                 }
             }
         }
@@ -58,5 +60,5 @@ struct OtpPassVerify: View {
 
 #Preview {
     OtpPassVerify(email: "Example@gmail.com")
-        .environment(Navigation())
+        .environmentObject(Navigation())
 }

@@ -24,9 +24,12 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		5B1D9F672D339E1700FA4FA8 /* New_Conversation */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = New_Conversation; sourceTree = "<group>"; };
 		5B3C15222D075A3400BE968E /* Conversations */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Conversations; sourceTree = "<group>"; };
 		5B3C15272D075A3400BE968E /* Preview Content */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Preview Content"; sourceTree = "<group>"; };
 		5B3C15332D075A3400BE968E /* Chat */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Chat; sourceTree = "<group>"; };
+		5BA42E902D34BC0D00959021 /* New_Room */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = New_Room; sourceTree = "<group>"; };
+		5BA42ECD2D34CF4900959021 /* Add_Room_Member */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Add_Room_Member; sourceTree = "<group>"; };
 		5BC1F3A32D10974F00124D9B /* Auth */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Auth; sourceTree = "<group>"; };
 		5BC1F3A92D10974F00124D9B /* Common */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Common; sourceTree = "<group>"; };
 		5BC1F3AC2D10974F00124D9B /* Navigation */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Navigation; sourceTree = "<group>"; };
@@ -53,6 +56,9 @@
 		5B3C150F2D075A1300BE968E /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				5BA42ECD2D34CF4900959021 /* Add_Room_Member */,
+				5BA42E902D34BC0D00959021 /* New_Room */,
+				5B1D9F672D339E1700FA4FA8 /* New_Conversation */,
 				5BC1F3A32D10974F00124D9B /* Auth */,
 				5BC1F3A92D10974F00124D9B /* Common */,
 				5BC1F3AC2D10974F00124D9B /* Navigation */,
@@ -111,9 +117,12 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				5B1D9F672D339E1700FA4FA8 /* New_Conversation */,
 				5B3C15222D075A3400BE968E /* Conversations */,
 				5B3C15272D075A3400BE968E /* Preview Content */,
 				5B3C15332D075A3400BE968E /* Chat */,
+				5BA42E902D34BC0D00959021 /* New_Room */,
+				5BA42ECD2D34CF4900959021 /* Add_Room_Member */,
 				5BC1F3A32D10974F00124D9B /* Auth */,
 				5BC1F3A92D10974F00124D9B /* Common */,
 				5BC1F3AC2D10974F00124D9B /* Navigation */,

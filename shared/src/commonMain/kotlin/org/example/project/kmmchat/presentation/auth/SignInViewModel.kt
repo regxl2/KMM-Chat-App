@@ -41,8 +41,11 @@ class SignInViewModel(
             val signInBody = _signInUiState.value.toSignInBody()
             when (val result = authRepository.signIn(signInBody = signInBody)) {
                 is Result.Success -> {
-                    if (result.data == null) throw NoSuchElementException()
-                    credentialsRepository.setUserId(result.data.token)
+                    if (result.data == null){
+                        _signInUiState.value = _signInUiState.value.copy(error = "Something went wrong, please try again")
+                        return@launch
+                    }
+                    credentialsRepository.setToken(result.data.token)
                     _signInUiState.value = _signInUiState.value.copy(
                         navigate = true,
                         isLoading = false,

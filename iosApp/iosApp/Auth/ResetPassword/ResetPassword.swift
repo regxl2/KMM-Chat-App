@@ -7,7 +7,8 @@
 import SwiftUI
 
 struct ResetPassword: View{
-    @Environment(Navigation.self) private var navigation
+    @EnvironmentObject private var navigation: Navigation
+    @Environment(\.dismiss) var dismiss
     @StateObject private var viewModelAdapter: ResetPasswordViewModelAdapter = ResetPasswordViewModelAdapter()
     let email: String
     
@@ -46,7 +47,8 @@ struct ResetPassword: View{
         .toolbar{
             ToolbarItem(placement: .navigationBarLeading){
                 BackButton{
-                    navigation.navigateBack()
+                    dismiss()
+                    navigation.popBackStack()
                 }
             }
         }
@@ -68,5 +70,5 @@ struct ResetPassword: View{
 
 #Preview {
     ResetPassword(email: "example@gmail.com")
-        .environment(Navigation())
+        .environmentObject(Navigation())
 }

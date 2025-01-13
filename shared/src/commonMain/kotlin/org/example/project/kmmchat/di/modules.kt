@@ -28,6 +28,11 @@ enum class Qualifier {
     API_CLIENT
 }
 
+enum class OS{
+    ANDROID,
+    IOS
+}
+
 expect val platformModule: Module
 expect val utilityModule: Module
 

@@ -57,6 +57,7 @@ fun NewConversation(
                     SearchBox(
                         modifier = Modifier.fillMaxWidth(0.85f),
                         text = text,
+                        placeholder = "Search user",
                         onValueChange = viewModel::onQueryChange
                     )
                 }

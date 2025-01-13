@@ -8,7 +8,8 @@ import SwiftUI
 
 struct ForgotPassword: View{
     @StateObject private var viewModelAdapter: ForgotPasswordViewModelAdapter = ForgotPasswordViewModelAdapter()
-    @Environment(Navigation.self) var navigation
+    @EnvironmentObject private var navigation: Navigation
+    @Environment(\.dismiss) var dismiss
     
     var body: some View{
         CircularIndicatorBox(isLoading: viewModelAdapter.isLoading, content: {
@@ -50,8 +51,8 @@ struct ForgotPassword: View{
         .toolbar{
             ToolbarItem(placement: .navigationBarLeading){
                 BackButton{
-                    navigation.navigateBack()
-                }
+                    dismiss()
+                    navigation.popBackStack()                }
             }
         }
         .padding()
@@ -62,5 +63,5 @@ struct ForgotPassword: View{
 
 #Preview {
     ForgotPassword()
-        .environment(Navigation())
+        .environmentObject(Navigation())
 }

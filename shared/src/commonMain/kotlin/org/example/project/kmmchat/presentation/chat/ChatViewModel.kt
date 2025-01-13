@@ -3,6 +3,7 @@ package org.example.project.kmmchat.presentation.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,7 +12,9 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.example.project.kmmchat.di.OS
 import org.example.project.kmmchat.domain.model.MessageRequest
+import org.example.project.kmmchat.domain.model.WebSocketDetails
 import org.example.project.kmmchat.domain.repository.ChatRepository
 import org.example.project.kmmchat.domain.repository.CredentialsRepository
 import org.example.project.kmmchat.presentation.common.toMessageResponseUIForChatUi
@@ -21,11 +24,12 @@ import org.example.project.kmmchat.util.Result
 
 class ChatViewModel(
     private val chatRepository: ChatRepository,
-    private val credentialsRepository: CredentialsRepository
+    private val credentialsRepository: CredentialsRepository,
+    private val os: OS
 ) : ViewModel() {
 
     private val _chat =
-        MutableStateFlow(ChatUi(conversationId = "", conversationType = ChatType.CHAT, name = ""))
+        MutableStateFlow(ChatUi(conversationId = "", conversationType = ChatType.CHAT, name = "", avatar = null, messages = emptyList()))
     val chat: StateFlow<ChatUi> = _chat.asStateFlow()
 
     private val _loading = MutableStateFlow(false)
@@ -37,7 +41,16 @@ class ChatViewModel(
     private val _text = MutableStateFlow("")
     val text = _text.asStateFlow()
 
+    private var getMessagesJob : Job? = null
+    private var loadMessageJob : Job? = null
+
     init {
+        if (os == OS.ANDROID){
+            initStates()
+        }
+    }
+
+    fun initStates(){
         observeMessages()
         loadChatInformation()
     }
@@ -67,29 +80,35 @@ class ChatViewModel(
                 )
             )
             when(result){
-                is Result.Success -> {onTextChange("")}
+                is Result.Success -> {
+                    onTextChange("")
+                }
                 is Result.Error -> {}
             }
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun observeMessages() {
-        viewModelScope.launch {
+    private fun observeMessages() {
+        getMessagesJob?.cancel()
+        getMessagesJob = viewModelScope.launch {
             credentialsRepository.getUserId().flatMapLatest { userId ->
                 if (userId != null) {
-                    chatRepository.getMessages(userId = userId).map { it.toMessageResponseUIForChatUi() }
+                    val webSocketDetails = WebSocketDetails(userId = userId, conversationId = chat.value.conversationId)
+                    chatRepository.getMessages(webSocketDetails).map { it.toMessageResponseUIForChatUi() }
                 } else {
                     flowOf()
                 }
             }.collect { message ->
+                println(message.content)
                 _chat.value = _chat.value.copy(messages = _chat.value.messages + message)
             }
         }
     }
 
-    fun loadChatInformation() {
-        viewModelScope.launch {
+    private fun loadChatInformation() {
+        loadMessageJob?.cancel()
+        loadMessageJob = viewModelScope.launch {
             _loading.value = true
             _error.value = null
             val token = credentialsRepository.getToken().firstOrNull()
@@ -116,14 +135,28 @@ class ChatViewModel(
         }
     }
 
-    fun disconnect() {
+    fun clearStates() {
+        _chat.value = ChatUi(conversationId = "", conversationType = ChatType.CHAT, name = "")
+        _loading.value = false
+        _error.value = null
+        _text.value = ""
+        disconnect()
+    }
+
+    private fun disconnect(){
+        getMessagesJob?.cancel()
+        getMessagesJob?.cancel()
+        getMessagesJob = null
+        loadMessageJob = null
         viewModelScope.launch {
             chatRepository.disconnect()
         }
     }
 
     override fun onCleared() {
+        viewModelScope.launch {
+            chatRepository.disconnect()
+        }
         super.onCleared()
-        disconnect()
     }
 }

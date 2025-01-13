@@ -28,6 +28,7 @@ import org.koin.dsl.module
 actual val utilityModule = module {
     single(qualifier = named(Qualifier.WEBSOCKET_URL)) { "ws://10.0.2.2:3001" }
     single(qualifier = named(Qualifier.API_URL)) { "http://10.0.2.2:8080/api/v1" }
+    single { OS.ANDROID }
 }
 
 actual val platformModule = module {
@@ -56,7 +57,6 @@ actual val platformModule = module {
     // viewModel
     viewModelOf(::SignUpViewModel)
     viewModelOf(::SignInViewModel)
-    viewModelOf(::OtpPassVerifyViewModel)
     viewModelOf(::OtpAccountVerifyViewModel)
     viewModelOf(::ResetPasswordViewModel)
     viewModelOf(::ForgotPasswordViewModel)

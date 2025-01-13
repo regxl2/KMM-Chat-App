@@ -54,6 +54,7 @@ fun AddGroupMember(modifier: Modifier = Modifier, conversationId: String, onNavi
                     SearchBox(
                         modifier = Modifier.fillMaxWidth(0.85f),
                         text = text,
+                        placeholder = "Add members",
                         onValueChange = viewModel::onQueryChange
                     )
                 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 fun SearchBox(
     modifier: Modifier = Modifier,
     text: String,
+    placeholder: String,
     onValueChange: (String) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -57,7 +59,12 @@ fun SearchBox(
                 }),
                 onValueChange = { onValueChange(it.text) },
                 singleLine = true
-            )
+            ){ innerTextField ->
+                if(text.isEmpty()){
+                    Text(text = placeholder)
+                }
+                innerTextField()
+            }
         }
         Icon(
             modifier = Modifier.fillMaxWidth(),
@@ -70,5 +77,5 @@ fun SearchBox(
 @Preview(showBackground = true)
 @Composable
 private fun PreviewSearchBox() {
-    SearchBox(text = "example", onValueChange = {})
+    SearchBox(text = "example", placeholder = "Search", onValueChange = {})
 }

@@ -14,20 +14,7 @@ struct MessageItem: View {
     var body: some View {
         HStack(alignment: .top){
             if(!message.isMine){
-//                AsyncImage(url: URL(string: message.senderName)){
-//                    phase in
-//                    if let image = phase.image{
-//                        image
-//                    }
-//                    else{
-//                        Color.gray
-//                    }
-//                }
-//                .frame(width: 50, height: 50)
-//                .clipShape(Circle())
-                Circle()
-                    .fill(Color.gray)
-                    .frame(width: 50, height: 50)
+                AvatarAlt(text: message.senderName.prefix(1).capitalized)
             }
             else{
                 Spacer()

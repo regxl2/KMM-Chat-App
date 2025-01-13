@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -36,10 +35,13 @@ class NewConversationViewModel(
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val searchUiState: StateFlow<SearchUiState> = query
         .debounce(1000)
-        .filter { it.isNotEmpty() }
         .distinctUntilChanged()
         .flatMapLatest { text ->
             flow {
+                if(text.isEmpty()){
+                    emit(SearchUiState.Idle)
+                    return@flow
+                }
                 emit(SearchUiState.Loading)
                 val token = credentialsRepository.getToken().firstOrNull()
                 if (token == null) {

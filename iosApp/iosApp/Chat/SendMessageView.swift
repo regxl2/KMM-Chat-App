@@ -14,8 +14,8 @@ struct SendMessageView: View {
     var body: some View {
         HStack{
             TextField("Enter the message", text: $text)
+                .padding(10)
                 .frame(height: 50)
-                .padding(2)
                 .overlay{
                     RoundedRectangle(cornerRadius: 10).stroke(.gray, lineWidth: 1)
                 }

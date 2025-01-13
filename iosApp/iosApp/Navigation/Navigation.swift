@@ -7,19 +7,28 @@
 //
 import SwiftUI
 
-@Observable
-final class Navigation{
-    var navPath: NavigationPath = NavigationPath()
-    var navStack: [NavRoutes] = []
+final class Navigation: ObservableObject{
+    @Published var navPath: NavigationPath = NavigationPath()
+    @Published var navStack: [NavRoutes] = []
     
     func navigateTo(destination: NavRoutes){
+        print("\(navPath.count) \(navStack.count)")
         navPath.append(destination)
         navStack.append(destination)
+        print("\(navPath.count) \(navStack.count)")
     }
     
     func navigateBack(){
+        print("\(navPath.count) \(navStack.count)")
         navPath.removeLast()
         navStack.removeLast()
+        print("\(navPath.count) \(navStack.count)")
+    }
+    
+    func popBackStack(){
+        print("\(navPath.count) \(navStack.count)")
+        navStack.removeLast()
+        print("\(navPath.count) \(navStack.count)")
     }
     
     func navigateBack(to destination: NavRoutes){
@@ -30,8 +39,10 @@ final class Navigation{
     }
     
     func navigateTo(destination: NavRoutes, popUpToBuilder: ()-> Void){
+        print("\(navPath.count) \(navStack.count)")
         popUpToBuilder()
         navigateTo(destination: destination)
+        print("\(navPath.count) \(navStack.count)")
     }
     
     func navigateToStartDestination(){

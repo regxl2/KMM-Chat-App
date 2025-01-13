@@ -18,6 +18,9 @@ enum NavRoutes: Hashable, Codable{
     case Conversations
     case Chat(conversationId: String, conversationType: String, name: String)
     case Loading
+    case NewConversation
+    case NewRoom
+    case AddRoomMember(conversationId: String)
 }
 
 extension ContentView{
@@ -35,7 +38,10 @@ extension ContentView{
             conversationId: conversationId,
             conversationType: conversationType == "chat" ? ChatType.chat: ChatType.room,
             name: name)
-        case .Loading: CircularIndicatorBox(isLoading: true){ EmptyView() }
+        case .Loading: LoadingScreen()
+        case .NewConversation: NewConversation()
+        case .NewRoom: NewRoom()
+        case .AddRoomMember(let conversationId): AddRoomMember(conversationId: conversationId)
         }
     }
 }

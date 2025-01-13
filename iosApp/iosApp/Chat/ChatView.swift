@@ -11,28 +11,39 @@ import Shared
 
 
 struct ChatView: View {
-    let conversationId: String
-    let conversationType: ChatType
-    let name: String
-    @Environment(Navigation.self) var navigation
-    @StateObject private var viewModelAdapter: ChatViewModelAdapter = ChatViewModelAdapter()
+
+    @EnvironmentObject private var navigation: Navigation
+    @Environment(\.dismiss) var dismiss
+    @StateObject private var viewModelAdapter: ChatViewModelAdapter
+    
+    init(conversationId: String, conversationType: ChatType, name: String){
+        _viewModelAdapter = StateObject(wrappedValue: ChatViewModelAdapter(conversationId: conversationId, conversationType: conversationType, name: name))
+    }
     
     var body: some View {
         VStack{
-            ScrollViewReader{ proxy in
-                ScrollView(showsIndicators: false){
-                    LazyVStack{
-                        ForEach(viewModelAdapter.chat.messages, id: \.self){ message in
-                            MessageItem(message: message)
+            if(viewModelAdapter.isLoading){
+                LoadingScreen()
+            }
+            if let error = viewModelAdapter.error{
+                ErrorScreen(text: error)
+            }
+            else{
+                ScrollViewReader{ proxy in
+                    ScrollView(showsIndicators: false){
+                        LazyVStack{
+                            ForEach(viewModelAdapter.chat.messages, id: \.self){ message in
+                                MessageItem(message: message)
+                            }
                         }
+                        Color.clear
+                            .frame(height: 1)
+                            .id("bottomID")
                     }
-                    Color.clear
-                        .frame(height: 1)
-                        .id("bottomID")
-                }
-                .onChange(of: viewModelAdapter.chat.messages.count) {
-                    withAnimation {
-                        proxy.scrollTo("bottomID", anchor: .bottom)
+                    .onChange(of: viewModelAdapter.chat.messages.count) {
+                        withAnimation {
+                            proxy.scrollTo("bottomID", anchor: .bottom)
+                        }
                     }
                 }
             }
@@ -43,28 +54,41 @@ struct ChatView: View {
                 ),
                 onClickSend: {viewModelAdapter.sendMessage()})
         }
-        .navigationBarBackButtonHidden()
+        .navigationBarBackButtonHidden(true)
         .toolbar{
-            ToolbarItem(placement: .navigationBarLeading){
+            ToolbarItem(placement: .topBarLeading){
                 BackButton{
-                    navigation.navigateBack()
+                    dismiss()
+                    navigation.popBackStack()
+                }
+            }
+            if viewModelAdapter.chat.conversationType == .room {
+                ToolbarItem(placement: .topBarTrailing){
+                    Menu{
+                        Button("Add members") {
+                            navigation.navigateTo(
+                                destination: NavRoutes.AddRoomMember(
+                                    conversationId: viewModelAdapter.chat.conversationId)
+                            )
+                        }
+                    }
+                    label: {
+                        Image(systemName: "ellipsis")
+                            .foregroundColor(.primary)
+                    }
+                    
                 }
             }
         }
-        .onAppear{
-            viewModelAdapter.initializeChat(conversationId: conversationId, conversationType: conversationType, name: name)
-        }
-        .task {
+        .task{
             await viewModelAdapter.observeState()
-        }
-        .onDisappear{
-            viewModelAdapter.disconnect()
         }
         .padding(8)
         .navigationTitle(viewModelAdapter.chat.name)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
 
 #Preview {
     ChatView(conversationId: "123", conversationType: .chat, name: "John")

@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,8 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import org.example.project.kmmchat.util.ContentType
+import org.example.project.kmmchat.presentation.common.AvatarAlt
 import org.example.project.kmmchat.presentation.common.MessageResponseUI
+import org.example.project.kmmchat.util.ContentType
 
 @Composable
 fun MessageItem(modifier: Modifier = Modifier, message: MessageResponseUI) {
@@ -36,15 +34,7 @@ fun MessageItem(modifier: Modifier = Modifier, message: MessageResponseUI) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             if (!message.isMine) {
-//                Avatar(
-//                    url = "https://i.pravatar.cc/150?u=1",
-//                    contentDescription = "${message.senderName}'s avatar"
-//                )
-                Icon(
-                    modifier = Modifier.size(50.dp),
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "user profile"
-                )
+                AvatarAlt(text = message.senderName.substring(0, 1))
             }
             Column(
                 horizontalAlignment = Alignment.Start,

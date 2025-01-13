@@ -3,18 +3,19 @@ package org.example.project.kmmchat.data.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import org.example.project.kmmchat.data.remote.common_dto.toResponse
 import org.example.project.kmmchat.data.remote.chat_data_source.ChatDataSource
 import org.example.project.kmmchat.data.remote.chat_data_source.dto.toAddRoomUserDetailsDto
 import org.example.project.kmmchat.data.remote.chat_data_source.dto.toChatRequestDto
 import org.example.project.kmmchat.data.remote.chat_data_source.dto.toMessageRequestDto
 import org.example.project.kmmchat.data.remote.common_dto.toMessageResponse
+import org.example.project.kmmchat.data.remote.common_dto.toResponse
 import org.example.project.kmmchat.data.remote.websocket_data_source.WebSocketDataSource
 import org.example.project.kmmchat.domain.model.AddRoomUserDetails
 import org.example.project.kmmchat.domain.model.ChatRequest
 import org.example.project.kmmchat.domain.model.MessageRequest
 import org.example.project.kmmchat.domain.model.MessageResponse
 import org.example.project.kmmchat.domain.model.Response
+import org.example.project.kmmchat.domain.model.WebSocketDetails
 import org.example.project.kmmchat.domain.repository.ChatRepository
 import org.example.project.kmmchat.platform.DispatcherProvider
 import org.example.project.kmmchat.util.Result
@@ -29,9 +30,9 @@ class ChatRepositoryImpl(private val chatDataSource: ChatDataSource, private val
         }
     }
 
-    override suspend fun getMessages(userId: String): Flow<MessageResponse> {
+    override suspend fun getMessages(webSocketDetails: WebSocketDetails): Flow<MessageResponse> {
         return withContext(DispatcherProvider.io){
-            webSocketDataSource.connect(userId = userId).map { it.toMessageResponse() }
+            webSocketDataSource.connect(userId = webSocketDetails.userId, conversationId = webSocketDetails.conversationId).map { it.toMessageResponse() }
         }
     }
 

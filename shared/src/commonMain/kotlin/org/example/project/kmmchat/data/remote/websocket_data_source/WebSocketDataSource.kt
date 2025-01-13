@@ -32,12 +32,13 @@ class WebSocketDataSource(
         const val MAX_RETRIES = 5
     }
 
-    fun connect(userId: String): Flow<MessageResponseDto> {
+    fun connect(userId: String, conversationId: String): Flow<MessageResponseDto> {
         return flow {
             try {
                 httpClient.webSocketSession {
                     url(websocketUrl)
                     parameter("userId", userId)
+                    parameter("conversationId", conversationId)
                 }
                     .also { webSocketSession = it }
                     .incoming.receiveAsFlow()

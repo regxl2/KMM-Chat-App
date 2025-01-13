@@ -15,28 +15,26 @@ class ConversationsViewModelAdapter: ObservableObject {
     @Published var error: String? = nil
     @Published var conversationsUi: ConversationsUI = ConversationsUI(conversations: [])
     
-    init(){
-        print("init")
-    }
-    
-    @MainActor
-    func startObserving() async{
+    func observeStates() async{
         await withTaskGroup(of: Void.self){ group in
-            group.addTask {
+            group.addTask { [weak self] in
+                guard let self = self else { return }
                 for await isLoading in self.viewModel.isLoading{
                     await MainActor.run{
                         self.isLoading = isLoading as! Bool
                     }
                 }
             }
-            group.addTask {
+            group.addTask { [weak self] in
+                guard let self = self else { return }
                 for await error in self.viewModel.error{
                     await MainActor.run{
                         self.error = error
                     }
                 }
             }
-            group.addTask {
+            group.addTask { [weak self] in
+                guard let self = self else { return }
                 for await conversationsUi in self.viewModel.conversationUiState{
                     await MainActor.run{
                         self.conversationsUi = conversationsUi
@@ -45,13 +43,17 @@ class ConversationsViewModelAdapter: ObservableObject {
             }
         }
     }
+    
+    func logout(){
+        viewModel.logout()
+    }
 
-    func getConversationList() {
+    func getConversationList(){
         viewModel.getConversationList()
     }
     
     deinit{
-        print("deinit")
+        viewModel.clearStates()
     }
 
 }

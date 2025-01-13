@@ -17,10 +17,7 @@ struct BackButton: View {
             action()
             presentationMode.wrappedValue.dismiss()
         }) {
-            HStack {
-                Image(systemName: "arrow.backward")
-                Text("back")
-            }
+            Image(systemName: "arrow.backward")
         }
     }
 }

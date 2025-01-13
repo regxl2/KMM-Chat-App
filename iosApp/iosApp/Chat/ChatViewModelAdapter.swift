@@ -8,18 +8,26 @@
 
 import SwiftUI
 import Shared
+import Combine
 
 class ChatViewModelAdapter: ObservableObject{
     private let viewModel: ChatViewModel = ViewModelProvider.shared.chatViewModel
+    
     @Published var chat: ChatUi = ChatUi(conversationId: "", conversationType: .chat, name: "chat", avatar: nil, messages: [])
     @Published var isLoading: Bool = false
     @Published var error: String? = nil
     @Published var text: String = ""
     
+    init(conversationId: String, conversationType: ChatType, name: String){
+        initializeChat(conversationId: conversationId, conversationType: conversationType, name: name)
+        initStates()
+    }
+    
     @MainActor
     func observeState() async {
         await withTaskGroup(of: Void.self) { group in
-            group.addTask {
+            group.addTask { [weak self] in
+                guard let self = self else { return }
                 for await state in self.viewModel.chat {
                     await MainActor.run{
                         self.chat = ChatUi(
@@ -33,7 +41,8 @@ class ChatViewModelAdapter: ObservableObject{
                 }
             }
             
-            group.addTask {
+            group.addTask { [weak self] in
+                guard let self = self else { return }
                 for await error in self.viewModel.error {
                     await MainActor.run{
                         self.error = error
@@ -41,7 +50,8 @@ class ChatViewModelAdapter: ObservableObject{
                 }
             }
             
-            group.addTask {
+            group.addTask { [weak self] in
+                guard let self = self else { return }
                 for await isLoading in self.viewModel.loading {
                     await MainActor.run{
                         self.isLoading = (isLoading as! Bool)
@@ -49,7 +59,8 @@ class ChatViewModelAdapter: ObservableObject{
                 }
             }
 
-            group.addTask {
+            group.addTask { [weak self] in
+                guard let self = self else { return }
                 for await text in self.viewModel.text {
                     await MainActor.run{
                         self.text = text
@@ -57,6 +68,10 @@ class ChatViewModelAdapter: ObservableObject{
                 }
             }
         }
+    }
+    
+    func initStates(){
+        viewModel.doInitStates()
     }
     
     func initializeChat(conversationId: String, conversationType: ChatType, name: String){
@@ -71,7 +86,8 @@ class ChatViewModelAdapter: ObservableObject{
         viewModel.sendMessage()
     }
     
-    func disconnect(){
-        viewModel.disconnect()
+    deinit{
+        viewModel.clearStates()
+        print("deinit chat")
     }
 }
