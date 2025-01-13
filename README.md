@@ -92,8 +92,6 @@ The backend is built with modern technologies to provide robust real-time commun
 ## Getting Started
 
 Refer to individual setup guides in each directory for detailed instructions:
-- Frontend setup: `/composeApp/README.md`
-- iOS setup: `/iosApp/README.md`
 - Backend setup: `/chat-app-backend/README.md`
 
 ## Preview of the App
