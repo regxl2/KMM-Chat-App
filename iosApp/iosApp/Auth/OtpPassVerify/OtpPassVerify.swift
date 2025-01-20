@@ -6,31 +6,29 @@
 //
 
 import SwiftUI
+import Shared
 
 struct OtpPassVerify: View {
     @EnvironmentObject private var navigation: Navigation
-    @Environment(\.dismiss) var dismiss
-    @StateObject private var viewModelAdapter: OtpPassVerifyViewModelAdapter = OtpPassVerifyViewModelAdapter()
-    let email: String
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var viewModel = ViewModelProvider.shared.otpPasswordViewModel
     
     init(email: String){
-        self.email = email
+        viewModel.doInitEmail(email: email)
     }
     
     var body: some View{
-        CircularIndicatorBox(isLoading: viewModelAdapter.isLoading, content: {
-            OtpView(title: "Password Reset", email: email,
-                    code: Binding(
-                        get: {viewModelAdapter.code},
-                        set: { value in viewModelAdapter.onOtpChange(code: value)}
-                    ),
-                    error: viewModelAdapter.error,
-                    resendAction: {viewModelAdapter.resendOtp()},
-                    verifyAction: {viewModelAdapter.verifyPassReset()}
+        CircularIndicatorBox(isLoading: viewModel.state.isLoading, content: {
+            OtpView(title: "Password Reset",
+                    email: viewModel.getEmail(),
+                    error: viewModel.state.error,
+                    onOtpChange: {value in viewModel.onOtpChange(otp: value)},
+                    resendAction: {viewModel.resendOtp()},
+                    verifyAction: {viewModel.verifyPassReset()}
             )
         })
         .navigationBarBackButtonHidden()
-        .toolbar{
+        .toolbar {
             ToolbarItem(placement: .navigationBarLeading){
                 BackButton{
                     dismiss()
@@ -38,23 +36,36 @@ struct OtpPassVerify: View {
                 }
             }
         }
-        .onAppear{
-            viewModelAdapter.initEmail(email: email)
+        .onDisappear{
+            viewModel.resetState()
         }
-        .task {
-            await viewModelAdapter.observeState()
-        }
-        .onChange(of: viewModelAdapter.navigateScreen) { _, newValue in
+        .onChange(of: viewModel.state.navigateScreen) { _, newValue in
             if newValue {
                 navigation.navigateTo(
-                    destination: NavRoutes.ResetPassword(email: email),
+                    destination: NavRoutes.ResetPassword(email: viewModel.getEmail()),
                     popUpToBuilder: {
                         navigation.navigateToStartDestination()
                     }
                 )
-                viewModelAdapter.resetNavigate()
+                viewModel.resetNavigate()
             }
         }
+    }
+}
+
+extension OtpPassVerifyViewModel{
+    var state: OtpUi{
+        get{
+            return self.state(
+                \.otpPassVerifyUiState,
+                 equals: { $0 == $1 },
+                 mapper: { $0 }
+            )
+        }
+    }
+    
+    func resetState(){
+        resetNavigate()
     }
 }
 

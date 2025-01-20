@@ -1,12 +1,9 @@
 package org.example.project.kmmchat.presentation.auth
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import dev.icerock.moko.mvvm.flow.cStateFlow
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.example.project.kmmchat.domain.repository.AuthRepository
 import org.example.project.kmmchat.util.Result
@@ -22,31 +19,28 @@ class SignUpViewModel(private val authRepository: AuthRepository) : ViewModel() 
             navigateToOtp = false
         )
     )
-    val signUpUiState = _signUpUiState.asStateFlow()
-
-    val isSignUpButtonEnabled = _signUpUiState.map {
-        it.name.isNotEmpty() && it.email.isNotEmpty() && it.password.isNotEmpty() && !it.isLoading
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = false
-    )
+    val signUpUiState = _signUpUiState.asStateFlow().cStateFlow()
 
     fun signUp() {
-        val signUpDetails = signUpUiState.value.toSignUpBody()
-        _signUpUiState.value = _signUpUiState.value.copy(isLoading = true, error = null)
         viewModelScope.launch {
+            val signUpDetails = signUpUiState.value.toSignUpBody()
+            _signUpUiState.value = _signUpUiState.value.copy(isLoading = true, error = null)
             when (val result = authRepository.signUp(signUpDetails)) {
                 is Result.Success -> {
-                    if (result.data != null) {
+                    if (result.data == null) {
+                        _signUpUiState.value = _signUpUiState.value.copy(
+                            isLoading = false,
+                            error = "Something went wrong, please try again"
+                        )
+                        return@launch
+                    } else {
                         _signUpUiState.value = _signUpUiState.value.copy(
                             isLoading = false,
                             navigateToOtp = true
                         )
-                    } else {
-                        throw Exception()
                     }
                 }
+
                 is Result.Error -> {
                     _signUpUiState.value =
                         _signUpUiState.value.copy(isLoading = false, error = result.message)

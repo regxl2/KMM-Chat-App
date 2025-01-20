@@ -10,25 +10,21 @@ import Shared
 struct OtpAccountVerify: View{
     @EnvironmentObject private var navigation: Navigation
     @Environment(\.dismiss) var dismiss
-    @StateObject private var otpAccountVerifyAdapter: OtpAccountVerifyViewModelAdapter = OtpAccountVerifyViewModelAdapter()
-    let email: String
+    @ObservedObject private var viewModel = ViewModelProvider.shared.otpAccountVerifyViewModel
     
     
     init(email: String) {
-        self.email = email
+        viewModel.doInitEmail(email: email)
     }
     
     var body: some View{
-        CircularIndicatorBox(isLoading: otpAccountVerifyAdapter.isLoading, content: {
+        CircularIndicatorBox(isLoading: viewModel.state.isLoading, content: {
             OtpView(title: "Account Verification",
-                    email: email,
-                    code: Binding(
-                        get: {otpAccountVerifyAdapter.code},
-                        set: { value in otpAccountVerifyAdapter.onOtpChange(code: value)}
-                    ),
-                    error: otpAccountVerifyAdapter.error,
-                    resendAction: {otpAccountVerifyAdapter.resendOtp()},
-                    verifyAction: {otpAccountVerifyAdapter.verifyAccount()}
+                    email: viewModel.getEmail(),
+                    error: viewModel.state.error,
+                    onOtpChange: {value in viewModel.onOtpChange(otp: value)},
+                    resendAction: { viewModel.resendOtp() },
+                    verifyAction: { viewModel.verifyAccount() }
             )
         })
         .navigationBarBackButtonHidden()
@@ -40,20 +36,32 @@ struct OtpAccountVerify: View{
                 }
             }
         }
-        .onAppear{
-            otpAccountVerifyAdapter.initEmail(email: email)
+        .onDisappear{
+            viewModel.resetState()
         }
-        .task {
-            await otpAccountVerifyAdapter.observeState()
-        }
-        .onChange(of: otpAccountVerifyAdapter.navigateScreen) { _, newValue in
+        .onChange(of: viewModel.state.navigateScreen ) { _, newValue in
             if newValue {
                 navigation.navigateToStartDestination()
-                otpAccountVerifyAdapter.resetNavigate()
+                viewModel.resetNavigate()
             }
         }
     }
+}
+
+extension OtpAccountVerifyViewModel {
+    var state: OtpUi {
+        get{
+            return self.state(
+                \.otpUiState,
+                 equals: { $0 == $1 },
+                 mapper: { $0 }
+            )
+        }
+    }
     
+    func resetState(){
+        resetNavigate()
+    }
 }
 
 #Preview {

@@ -6,14 +6,15 @@
 //
 
 import SwiftUI
-
+import Shared
 
 struct SignUp: View{
-    private let signUpViewModelAdapter: SignUpViewModelAdapter = SignUpViewModelAdapter()
+    @ObservedObject private var viewModel = ViewModelProvider.shared.signUpViewModel
     @EnvironmentObject private var navigation: Navigation
     @Environment(\.dismiss) var dismiss
+    
     var body: some View{
-        CircularIndicatorBox(isLoading: signUpViewModelAdapter.isLoading, content: {
+        CircularIndicatorBox(isLoading: viewModel.state.isLoading, content: {
             VStack(spacing: 16){
                 VStack(spacing: 8){
                     LargeTitleText(title: "Create Your Account")
@@ -21,21 +22,21 @@ struct SignUp: View{
                         .multilineTextAlignment(.center)
                 }
                 RectangularTextField(title: "Name",text: Binding(
-                    get: {signUpViewModelAdapter.name},
-                    set: {signUpViewModelAdapter.onNameChange(name: $0)})
+                    get: {viewModel.state.name},
+                    set: {viewModel.onNameChange(name: $0)})
                 )
                 RectangularTextField(title: "Email", text: Binding(
-                    get: {signUpViewModelAdapter.email},
-                    set:{signUpViewModelAdapter.onEmailChange(email: $0)})
+                    get: {viewModel.state.email},
+                    set:{viewModel.onEmailChange(email: $0)})
                 )
                 PasswordTextField(title: "Password", password: Binding(
-                    get: {signUpViewModelAdapter.password},
-                    set: {signUpViewModelAdapter.onPasswordChange(password: $0)})
+                    get: {viewModel.state.password},
+                    set: {viewModel.onPasswordChange(password: $0)})
                 )
-                if let error = signUpViewModelAdapter.error{
+                if let error = viewModel.state.error{
                     ErrorText(text: error)
                 }
-                RectangularButton(action: {signUpViewModelAdapter.signUp()}, title: "Sign Up", isDisabled: !signUpViewModelAdapter.isSignUpButtonEnabled)
+                RectangularButton(action: {viewModel.signUp()}, title: "Sign Up", isDisabled: !viewModel.state.isSignUpButtonEnabled )
                 HStack{
                     Text("Already have an account?")
                     Button("Sign In", action: {
@@ -54,15 +55,34 @@ struct SignUp: View{
                 }
             }
         }
-        .task{
-            await signUpViewModelAdapter.observeState()
+        .onDisappear{
+            viewModel.resetStates()
         }
-        .onChange(of: signUpViewModelAdapter.navigateToOtp){ _, newState in
+        .onChange(of: viewModel.state.navigateToOtp){ _, newState in
             if(newState){
-                navigation.navigateTo(destination: NavRoutes.OtpAccountVerify(email: signUpViewModelAdapter.email))
-                signUpViewModelAdapter.resetNavigate()
+                navigation.navigateTo(destination: NavRoutes.OtpAccountVerify(email: viewModel.state.email))
+                viewModel.resetNavigate()
             }
         }
+    }
+}
+
+extension SignUpViewModel {
+    var state: SignUpUi{
+        get{
+            return self.state(
+                \.signUpUiState,
+                 equals: { $0 == $1 },
+                 mapper: { $0 }
+            )
+        }
+    }
+    
+    func resetStates(){
+        self.onNameChange(name: "")
+        self.onEmailChange(email: "")
+        self.onPasswordChange(password:"")
+        self.resetNavigate()
     }
 }
 

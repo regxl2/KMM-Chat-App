@@ -47,7 +47,6 @@ fun SignIn(
     val focusManager = LocalFocusManager.current
 
     val signInUiState by viewModel.signInUiState.collectAsStateWithLifecycle()
-    val isSignInEnabled by viewModel.isSignInButtonEnabled.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         emailFocusRequester.requestFocus()
@@ -100,7 +99,7 @@ fun SignIn(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { viewModel.signIn() },
-                enabled = isSignInEnabled
+                enabled = signInUiState.isSignInButtonEnabled
             ) {
                 Text(
                     text = "Sign In",

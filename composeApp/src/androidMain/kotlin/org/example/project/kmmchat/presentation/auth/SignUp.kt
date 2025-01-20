@@ -47,7 +47,6 @@ fun SignUp(
     val focusManager = LocalFocusManager.current
 
     val signUpUiState by viewModel.signUpUiState.collectAsStateWithLifecycle()
-    val isSignUpEnabled by viewModel.isSignUpButtonEnabled.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = Unit) {
         nameFocusRequester.requestFocus()
@@ -111,7 +110,7 @@ fun SignUp(
                 onClick = {
                     viewModel.signUp()
                 },
-                enabled = isSignUpEnabled
+                enabled = signUpUiState.isSignUpButtonEnabled
             ) {
                 Text(
                     text = "Sign Up",

@@ -1,7 +1,7 @@
 package org.example.project.kmmchat.presentation.conversations
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import dev.icerock.moko.mvvm.flow.cStateFlow
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,15 +17,19 @@ class ConversationsViewModel(
 ) : ViewModel() {
 
     private val _conversationUiState = MutableStateFlow(ConversationsUI())
-    val conversationUiState = _conversationUiState.asStateFlow()
+    val conversationUiState = _conversationUiState.asStateFlow().cStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
+    val isLoading = _isLoading.asStateFlow().cStateFlow()
 
     private val _error = MutableStateFlow<String?>(null)
-    val error = _error.asStateFlow()
+    val error = _error.asStateFlow().cStateFlow()
 
     private var job: Job? = null
+
+    init {
+        getConversationList()
+    }
 
 
     fun logout(){

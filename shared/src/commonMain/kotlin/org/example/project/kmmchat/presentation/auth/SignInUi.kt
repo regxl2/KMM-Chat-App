@@ -8,7 +8,10 @@ data class SignInUi(
     val navigate: Boolean,
     val isLoading: Boolean,
     val error: String?
-)
+){
+    val isSignInButtonEnabled
+        get() = email.isNotEmpty() && password.isNotEmpty() && !isLoading
+}
 
 fun SignInUi.toSignInBody(): SignInBody{
     return SignInBody(

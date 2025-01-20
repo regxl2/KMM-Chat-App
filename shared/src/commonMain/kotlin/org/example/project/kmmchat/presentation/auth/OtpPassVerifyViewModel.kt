@@ -1,7 +1,7 @@
 package org.example.project.kmmchat.presentation.auth
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import dev.icerock.moko.mvvm.flow.cStateFlow
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -14,6 +14,7 @@ class OtpPassVerifyViewModel(
     private val authRepository: AuthRepository
 ) : ViewModel() {
     private var email = ""
+
     private val _otpPassVerifyUiState = MutableStateFlow(
         OtpUi(
             otp = "",
@@ -22,10 +23,13 @@ class OtpPassVerifyViewModel(
             navigateScreen = false
         )
     )
-    val otpPassVerifyUiState = _otpPassVerifyUiState.asStateFlow()
+    val otpPassVerifyUiState = _otpPassVerifyUiState.asStateFlow().cStateFlow()
 
     fun initEmail(email: String) {
         this.email = email
+    }
+    fun getEmail(): String{
+        return email
     }
 
     fun onOtpChange(otp: String) {

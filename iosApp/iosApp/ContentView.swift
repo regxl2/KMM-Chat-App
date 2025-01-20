@@ -11,7 +11,7 @@ import Shared
 
 struct ContentView: View {
     @StateObject private var navigation: Navigation = Navigation()
-    @StateObject private var viewModelAdapter: ContentViewModelAdapter = ContentViewModelAdapter()
+    @ObservedObject private var viewModel: MainViewModel = ViewModelProvider.shared.mainViewModel
     
     var body: some View {
         NavigationStack(path: $navigation.navPath){
@@ -22,21 +22,19 @@ struct ContentView: View {
                 content(route: route)
             }
         }
-        .task{
-            await viewModelAdapter.observeState()
-        }
         .environmentObject(navigation)
-        .environmentObject(viewModelAdapter)
+        .environmentObject(viewModel)
     }
 }
 
 extension ContentView {
     @ViewBuilder
     func contentView() -> some View {
-        switch viewModelAdapter.rootScreen {
+        switch viewModel.state(\.destination, equals: { $0 == $1 }, mapper: { $0 }) {
         case .auth: content(route: NavRoutes.SignIn)
         case .conversations: content(route: NavRoutes.Conversations)
         case .loading: content(route: NavRoutes.Loading)
+        default: EmptyView()
         }
     }
 }

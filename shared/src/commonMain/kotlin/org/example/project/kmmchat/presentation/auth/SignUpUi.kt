@@ -9,7 +9,10 @@ data class SignUpUi(
     val isLoading: Boolean,
     val error: String?,
     val navigateToOtp: Boolean
-)
+){
+    val isSignUpButtonEnabled: Boolean
+        get() = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && !isLoading
+}
 
 fun SignUpUi.toSignUpBody(): SignUpBody{
     return SignUpBody(

@@ -1,12 +1,9 @@
 package org.example.project.kmmchat.presentation.auth
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import dev.icerock.moko.mvvm.flow.cStateFlow
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.example.project.kmmchat.domain.repository.AuthRepository
 import org.example.project.kmmchat.domain.repository.CredentialsRepository
@@ -25,15 +22,7 @@ class SignInViewModel(
             error = null
         )
     )
-    val signInUiState = _signInUiState.asStateFlow()
-
-    val isSignInButtonEnabled = _signInUiState.map {
-        it.email.isNotEmpty() && it.password.isNotEmpty() && !it.isLoading
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = false
-    )
+    val signInUiState = _signInUiState.asStateFlow().cStateFlow()
 
     fun signIn() {
         viewModelScope.launch {
@@ -41,8 +30,11 @@ class SignInViewModel(
             val signInBody = _signInUiState.value.toSignInBody()
             when (val result = authRepository.signIn(signInBody = signInBody)) {
                 is Result.Success -> {
-                    if (result.data == null){
-                        _signInUiState.value = _signInUiState.value.copy(error = "Something went wrong, please try again")
+                    if (result.data == null) {
+                        _signInUiState.value = _signInUiState.value.copy(
+                            isLoading = false,
+                            error = "Something went wrong, please try again"
+                        )
                         return@launch
                     }
                     credentialsRepository.setToken(result.data.token)

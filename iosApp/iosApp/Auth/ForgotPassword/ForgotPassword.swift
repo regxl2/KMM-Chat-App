@@ -5,48 +5,50 @@
 //  Created by Abhishek Rathore on 10/12/24.
 //
 import SwiftUI
+import Shared
 
 struct ForgotPassword: View{
-    @StateObject private var viewModelAdapter: ForgotPasswordViewModelAdapter = ForgotPasswordViewModelAdapter()
+    @StateObject private var viewModel = ViewModelProvider.shared.forgotPasswordViewModel
     @EnvironmentObject private var navigation: Navigation
     @Environment(\.dismiss) var dismiss
     
     var body: some View{
-        CircularIndicatorBox(isLoading: viewModelAdapter.isLoading, content: {
+        CircularIndicatorBox(isLoading: viewModel.state.isLoading , content: {
             VStack(spacing: 16){
-                LargeTitleText(title: "Forgot Password")
                 RectangularTextField(
                     title: "Email",
                     text: Binding(
-                        get: {viewModelAdapter.email},
-                        set: {value in viewModelAdapter.onEmailChange(email: value)}
+                        get: { viewModel.state.email },
+                        set: {value in viewModel.onEmailChange(email: value)}
                     )
                 )
                 RectangularButton(
                     action: {
-                        viewModelAdapter.onSubmit()
+                        viewModel.onSubmit()
                     }
                     ,
-                    title: "Submit", isDisabled: viewModelAdapter.email.isEmpty
+                    title: "Submit", isDisabled: viewModel.state.email.isEmpty
                 )
-                if let error = viewModelAdapter.error {
+                if let error = viewModel.state.error {
                     ErrorText(text: error)
                 }
                 Button("Back to Sign In", action: {navigation.navigateBack()})
                 Spacer()
             }
         })
-        .task {
-            await viewModelAdapter.observeState()
+        .onDisappear{
+            viewModel.resetState()
         }
-        .onChange(of: viewModelAdapter.navigateToOtp,{ _, newValue in
+        .onChange(of: viewModel.state.navigateToOtp){ _ , newValue in
             if newValue {
                 navigation.navigateTo(
-                    destination: NavRoutes.OtpPassVerify(email: viewModelAdapter.email)
+                    destination: NavRoutes.OtpPassVerify(email: viewModel.state.email)
                 )
-                viewModelAdapter.resetNavigate()
+                viewModel.resetNavigate()
             }
-        })
+        }
+        .navigationTitle("Forgot Password")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
         .toolbar{
             ToolbarItem(placement: .navigationBarLeading){
@@ -57,6 +59,22 @@ struct ForgotPassword: View{
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+extension ForgotPasswordViewModel{
+    var state : ForgotPasswordUI {
+        get{
+            return self.state(
+                \.forgotPasswordUiState,
+                 equals: { $0 == $1 },
+                 mapper: { $0 }
+            )
+        }
+    }
+    
+    func resetState(){
+        resetNavigate()
     }
 }
 

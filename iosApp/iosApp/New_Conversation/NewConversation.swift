@@ -11,8 +11,8 @@ import Shared
 struct NewConversation: View {
     @EnvironmentObject private var navigation: Navigation
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject private var contentViewModelAdapter: ContentViewModelAdapter
-    @StateObject private var viewModelAdapter = NewConversationViewModelAdapter()
+    @EnvironmentObject private var mainViewModel: MainViewModel
+    @ObservedObject private var viewModel = ViewModelProvider.shared.newConversationViewModel
 
     var body: some View {
         ZStack{
@@ -29,12 +29,9 @@ struct NewConversation: View {
                 }
             }
         }
-        .task{
-            await viewModelAdapter.observeStates()
-        }
         .searchable(text: Binding(
-            get: { viewModelAdapter.query },
-            set: { newQuery in viewModelAdapter.onQueryChange(newQuery: newQuery) }
+            get: { viewModel.queryState },
+            set: { newQuery in viewModel.onQueryChange(newQuery: newQuery) }
         ), prompt: "Search Users")
     }
 }
@@ -42,15 +39,14 @@ struct NewConversation: View {
 private extension NewConversation {
     @ViewBuilder
     func contentView() -> some View {
-        switch onEnum(of: viewModelAdapter.searchUiState) {
-        case .idle:
+        switch viewModel.searchState {
+        case _ as SearchUiState.Idle:
             EmptyView()
-        case .loading:
+        case _ as SearchUiState.Loading:
             LoadingScreen()
-        case .error(let error):
+        case let error as SearchUiState.Error:
             ErrorScreen(text: error.message)
-                .padding()
-        case .result(let result):
+        case let result as SearchUiState.Result:
             ScrollView {
                 LazyVStack {
                     ForEach(result.users, id: \.email) { user in
@@ -63,11 +59,12 @@ private extension NewConversation {
                     }
                 }
             }
+        default: ErrorScreen(text: "Unknown error")
         }
     }
 
     func handleUserSelection(user: User) {
-        let conversationId = getConversationId(email: user.email, userId: contentViewModelAdapter.userId)
+        let conversationId = getConversationId(email: user.email, userId: mainViewModel.userIdState)
         navigation.navigateTo(
             destination: NavRoutes.Chat(
                 conversationId: conversationId,
@@ -82,8 +79,34 @@ private extension NewConversation {
     }
 }
 
+extension MainViewModel{
+    var userIdState: String {
+        get{
+            return self.state(\.userId) ?? ""
+        }
+    }
+}
+
+extension NewConversationViewModel{
+    var queryState: String {
+        get{
+            return self.state(\.query) ?? ""
+        }
+    }
+    var searchState: SearchUiState{
+        get{
+            return self.state(
+                \.searchUiState,
+                 equals: { $0 == $1 },
+                 mapper: { $0 }
+            )
+        }
+    }
+}
+
 #Preview {
+    @ObservedObject var viewModel = ViewModelProvider.shared.newConversationViewModel
     NewConversation()
         .environmentObject(Navigation())
-        .environmentObject(ContentViewModelAdapter())
+        .environmentObject(viewModel)
 }

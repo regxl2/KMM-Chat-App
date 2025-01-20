@@ -5,17 +5,17 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     kotlin("plugin.serialization") version "1.9.0"
-    id("co.touchlab.skie") version "0.9.3"
+//    id("co.touchlab.skie") version "0.9.3"
 }
 
-skie {
-    features {
-        enableSwiftUIObservingPreview = true
-    }
-    features {
-        enableFlowCombineConvertorPreview = true
-    }
-}
+//skie {
+//    features {
+//        enableSwiftUIObservingPreview = true
+//    }
+//    features {
+//        enableFlowCombineConvertorPreview = true
+//    }
+//}
 
 kotlin {
     androidTarget {
@@ -34,15 +34,15 @@ kotlin {
             baseName = "Shared"
             isStatic = true
 
-//            export(libs.mvvm.core)
-//            export(libs.mvvm.flow)
+            export(libs.mvvm.core)
+            export(libs.mvvm.flow)
         }
     }
 
     sourceSets {
         androidMain.dependencies {
-//            api(libs.mvvm.core)
-//            api(libs.mvvm.flow)
+            api(libs.mvvm.core)
+            api(libs.mvvm.flow)
 
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
@@ -50,22 +50,22 @@ kotlin {
         }
         commonMain.dependencies {
 
-//            implementation(libs.mvvm.core)
-//            implementation(libs.mvvm.flow)
+            implementation(libs.mvvm.core)
+            implementation(libs.mvvm.flow)
             // put your Multiplatform dependencies here
             implementation(libs.kotlinx.datetime)
             implementation(libs.androidx.datastore.preferences.core)
             implementation(libs.koin.core)
             implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.koin.compose.viewmodel)
+//            implementation(libs.koin.compose.viewmodel)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation (libs.ktor.client.content.negotiation)
             implementation(libs.kermit)
         }
         iosMain.dependencies {
-//            api(libs.mvvm.core)
-//            api(libs.mvvm.flow)
+            api(libs.mvvm.core)
+            api(libs.mvvm.flow)
 
             implementation(libs.ktor.client.darwin)
         }

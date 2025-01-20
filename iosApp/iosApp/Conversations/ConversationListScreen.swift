@@ -10,13 +10,14 @@ import SwiftUI
 import Shared
 
 struct ConversationListScreen: View {
-    @StateObject private var viewModelAdapter: ConversationsViewModelAdapter = ConversationsViewModelAdapter()
+    @ObservedObject private var viewModel = ViewModelProvider.shared.conversationsViewModel
     @EnvironmentObject private var navigation: Navigation
+    
     var body: some View {
         ZStack{
             ScrollView(showsIndicators: false){
                 LazyVStack{
-                    ForEach(viewModelAdapter.conversationsUi.conversations, id: \.conversationId){ conversation in
+                    ForEach(viewModel.conversationState.conversations, id: \.conversationId){ conversation in
                         ConversationItem(conversation: conversation){
                             navigation.navigateTo(
                                 destination: NavRoutes.Chat(
@@ -55,7 +56,7 @@ struct ConversationListScreen: View {
                         navigation.navigateTo(destination: NavRoutes.NewRoom)
                     }
                     Button("Logout") {
-                        viewModelAdapter.logout()
+                        viewModel.logout()
                     }
                 } label: {
                     Image(systemName: "ellipsis")
@@ -63,17 +64,36 @@ struct ConversationListScreen: View {
                 }
             }
         }
-        .onAppear {
-            viewModelAdapter.getConversationList()
-        }
-        .task{
-            await viewModelAdapter.observeStates()
+        .onAppear{
+            viewModel.getConversationList()
         }
         .refreshable {
-            viewModelAdapter.getConversationList()
+            viewModel.getConversationList()
         }
         .navigationTitle("Conversations")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+extension ConversationsViewModel{
+    var conversationState: ConversationsUI{
+        get{
+            return self.state(
+                \.conversationUiState,
+                 equals: { $0 == $1 },
+                 mapper: { $0 }
+            )
+        }
+    }
+    var loadingState: Bool{
+        get{
+            return self.state(\.isLoading)
+        }
+    }
+    var errorState: String? {
+        get{
+            return self.stateNullable(\.error)
+        }
     }
 }
 
