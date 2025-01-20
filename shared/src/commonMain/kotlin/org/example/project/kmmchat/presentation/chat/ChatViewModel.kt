@@ -109,7 +109,6 @@ class ChatViewModel(
             chatRepository.getMessages(webSocketDetails)
                 .map { it.toMessageResponseUIForChatUi() }
                 .collect{ message ->
-                    println(message.content)
                     _chat.value = _chat.value.copy(messages = _chat.value.messages + message)
                 }
         }

@@ -67,14 +67,10 @@ class ConversationsViewModel(
         }
     }
 
-    fun clearStates(){
+    fun resetStates(){
+        job?.cancel()
         _error.value = null
         _isLoading.value = false
         _conversationUiState.value = ConversationsUI()
-    }
-
-    override fun onCleared() {
-        job?.cancel()
-        super.onCleared()
     }
 }

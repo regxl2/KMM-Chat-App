@@ -56,6 +56,7 @@ struct ConversationListScreen: View {
                         navigation.navigateTo(destination: NavRoutes.NewRoom)
                     }
                     Button("Logout") {
+                        viewModel.resetStates()
                         viewModel.logout()
                     }
                 } label: {
