@@ -1,7 +1,7 @@
 package org.example.project.kmmchat.presentation
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import dev.icerock.moko.mvvm.flow.cStateFlow
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,7 +21,7 @@ class MainViewModel(
     ViewModel() {
 
     private val _userId = MutableStateFlow("")
-    val userId = _userId.asStateFlow()
+    val userId = _userId.asStateFlow().cStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val destination = credentialsRepository.getToken().flatMapLatest { value: String? ->
@@ -53,6 +53,6 @@ class MainViewModel(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = Destination.LOADING
-    )
+    ).cStateFlow()
 
 }

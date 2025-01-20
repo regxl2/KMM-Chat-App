@@ -10,13 +10,15 @@ import SwiftUI
 struct OtpView: View {
     let title: String
     let email: String
-    @Binding var code: [String]
     let error: String?
-    @FocusState var focus: Int?
+    @FocusState private var focus: Int?
+    let onOtpChange: (String) -> Void
     let resendAction: ()-> Void
     let verifyAction: ()-> Void
     
-    func isbuttonDisabled() -> Bool{
+    @State var code = Array(repeating: "", count: 4)
+    
+    private func isbuttonDisabled() -> Bool{
         code[0].isEmpty || code[1].isEmpty || code[2].isEmpty || code[3].isEmpty
     }
     
@@ -52,6 +54,7 @@ struct OtpView: View {
                             else{
                                 if index > 0 { focus = index - 1 }
                             }
+                            onOtpChange(code.joined())
                         }
                         .onKeyPress(.delete){
                             if(code[index].isEmpty){
@@ -83,6 +86,8 @@ struct OtpView: View {
 
 #Preview {
     @Previewable @State var code: [String] = Array(repeating: "", count: 4)
-    OtpView(title: "Account Verification", email: "example.com", code: $code, error: nil,
+    OtpView(title: "Account Verification", email: "example.com", error: nil,
+            onOtpChange: {_ in},
             resendAction: {}, verifyAction: {})
 }
+

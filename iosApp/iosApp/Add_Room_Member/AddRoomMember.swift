@@ -11,10 +11,10 @@ import Shared
 struct AddRoomMember: View{
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var navigation: Navigation
-    @StateObject var viewModelAdpater: AddRoomMemberViewModelAdapter
+    @ObservedObject private var viewModel = ViewModelProvider.shared.addRoomMemberViewModel
     
     init(conversationId: String){
-        _viewModelAdpater = StateObject(wrappedValue:AddRoomMemberViewModelAdapter(id:conversationId))
+        viewModel.setConversationId(id: conversationId)
     }
     
     var body: some View{
@@ -32,40 +32,59 @@ struct AddRoomMember: View{
                 }
             }
         }
-        .task{
-            await viewModelAdpater.obeserveStates()
+        .onDisappear{
+            viewModel.resetStates()
         }
         .searchable(text:
             Binding(
-                get: { viewModelAdpater.query },
-                set: { value in viewModelAdpater.onQueryChange(newQuery: value)}
+                get: { viewModel.queryState },
+                set: { value in viewModel.onQueryChange(newQuery: value)}
             ),
             prompt: "Add Members"
         )
     }
 }
 
+extension AddRoomMemberViewModel{
+    var queryState: String {
+        get{
+            return self.state(\.query) ?? ""
+        }
+    }
+    var searchState: SearchUiState{
+        get{
+            return self.state(
+                \.searchUiState,
+                 equals: { $0 == $1 },
+                 mapper: { $0 }
+            )
+        }
+    }
+}
+
 extension AddRoomMember{
     @ViewBuilder
     func contentView() -> some View{
-        switch onEnum(of: viewModelAdpater.searchUiState){
-        case .idle:
+        switch viewModel.searchState{
+        case _ as SearchUiState.Idle:
             EmptyView()
-        case .error(let error):
+        case let error as SearchUiState.Error:
             ErrorScreen(text: error.message)
-        case .loading:
+        case _ as SearchUiState.Loading:
             LoadingScreen()
-        case .result(let result):
+        case let result as SearchUiState.Result:
             ScrollView{
                 LazyVStack{
                     ForEach(0..<result.users.count, id: \.self){ index in
                         let user = result.users[index]
                         AddRoomMemberItem(user: user){
-                            viewModelAdpater.addUserToRoom(userId: user.email, index: index)
+                            viewModel.addUserToRoom(userId: user.email, index: Int32(index))
                         }
                     }
                 }
             }
+        default:
+            ErrorScreen(text: "Unknown Error")
         }
     }
 }

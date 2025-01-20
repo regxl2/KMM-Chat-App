@@ -1,7 +1,8 @@
 package org.example.project.kmmchat.presentation.new_room
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+
+import dev.icerock.moko.mvvm.flow.cStateFlow
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -16,13 +17,13 @@ class NewRoomViewModel(
     private val credentialsRepository: CredentialsRepository
 ) : ViewModel() {
     private val _roomName = MutableStateFlow("")
-    val roomName = _roomName.asStateFlow()
+    val roomName = _roomName.asStateFlow().cStateFlow()
 
     private val _error = MutableStateFlow<String?>(null)
-    val error = _error.asStateFlow()
+    val error = _error.asStateFlow().cStateFlow()
 
     private val _navigate = MutableStateFlow(false)
-    val navigate = _navigate.asStateFlow()
+    val navigate = _navigate.asStateFlow().cStateFlow()
 
     fun onValueChange(newText: String) {
         _roomName.value = newText
@@ -54,7 +55,7 @@ class NewRoomViewModel(
         }
     }
 
-    fun clearStates(){
+    fun resetStates(){
         _navigate.value = false
         _error.value = null
         _roomName.value = ""

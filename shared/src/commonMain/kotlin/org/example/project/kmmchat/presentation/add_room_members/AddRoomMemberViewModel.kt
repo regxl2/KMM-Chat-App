@@ -1,7 +1,7 @@
 package org.example.project.kmmchat.presentation.add_room_members
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import dev.icerock.moko.mvvm.flow.cStateFlow
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,10 +22,10 @@ class AddRoomMemberViewModel(
     private val credentialsRepository: CredentialsRepository
 ) : ViewModel() {
     private val _query = MutableStateFlow("")
-    val query = _query.asStateFlow()
+    val query = _query.asStateFlow().cStateFlow()
 
     private val _searchUiState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
-    val searchUiState = _searchUiState.asStateFlow()
+    val searchUiState = _searchUiState.asStateFlow().cStateFlow()
 
     private var conversationId: String = ""
 
@@ -88,7 +88,7 @@ class AddRoomMemberViewModel(
         }
     }
 
-    fun clearStates(){
+    fun resetStates(){
         job?.cancel()
         job = null
         _query.value = ""

@@ -1,7 +1,7 @@
 package org.example.project.kmmchat.presentation.auth
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import dev.icerock.moko.mvvm.flow.cStateFlow
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -25,7 +25,7 @@ class ResetPasswordViewModel(private val authRepository: AuthRepository) :
             error = null
         )
     )
-    val resetPasswordUiState = _resetPasswordUiState.asStateFlow()
+    val resetPasswordUiState = _resetPasswordUiState.asStateFlow().cStateFlow()
 
     fun resetNavigate() {
         _resetPasswordUiState.value = ResetPasswordUi(

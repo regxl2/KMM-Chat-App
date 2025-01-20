@@ -18,9 +18,6 @@ fun NavGraphBuilder.authNav(navController: NavHostController) {
                     navController.navigate(NavRoutes.Conversations) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
-                    navController.graph = navController.graph.apply {
-                        setStartDestination(NavRoutes.Conversations)
-                    }
                 },
                 navigateSignUp = { navController.navigate(NavRoutes.SignUp) },
                 navigateForgotPassword = { navController.navigate(NavRoutes.ForgotPassword) }

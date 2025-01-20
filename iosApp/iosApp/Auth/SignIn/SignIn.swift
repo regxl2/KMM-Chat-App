@@ -6,14 +6,14 @@
 //  Copyright © 2024 orgName. All rights reserved.
 //
 import SwiftUI
+import Shared
 
 struct SignIn: View{
-    @StateObject private var viewModelAdapter: SignInViewModelAdpater = SignInViewModelAdpater()
+    @ObservedObject private var viewModel = ViewModelProvider.shared.signInViewModel
     @EnvironmentObject private var navigation: Navigation
-    @EnvironmentObject private var iOSViewModelAdapter: ContentViewModelAdapter
     
     var body: some View{
-        CircularIndicatorBox(isLoading: viewModelAdapter.isLoading){
+        CircularIndicatorBox(isLoading: viewModel.state.isLoading){
             VStack( spacing: 16){
                 VStack(alignment: .leading, spacing: 16){
                     LargeTitleText(title: "Sign In to your account")
@@ -24,22 +24,22 @@ struct SignIn: View{
                 RectangularTextField(
                     title: "Email",
                     text: Binding(
-                        get: {viewModelAdapter.email},
-                        set: {value in viewModelAdapter.onEmailChange(email: value)}
+                        get: {viewModel.state.email},
+                        set: {value in viewModel.onEmailChange(email: value)}
                     )
                 )
                 
                 PasswordTextField(
                     title: "Password",
                     password: Binding(
-                        get: {viewModelAdapter.password},
-                        set: {value in viewModelAdapter.onPasswordChange(password: value)}
+                        get: {viewModel.state.password},
+                        set: {value in viewModel.onPasswordChange(password: value)}
                     )
                 )
-                if let error = viewModelAdapter.error{
+                if let error = viewModel.state.error{
                     ErrorText(text: error)
                 }
-                RectangularButton(action: {viewModelAdapter.signIn()}, title: "Sign In", isDisabled: viewModelAdapter.isButtonDisabled)
+                RectangularButton(action: {viewModel.signIn()}, title: "Sign In", isDisabled: !viewModel.state.isSignInButtonEnabled)
                 VStack(spacing: 16){
                     HStack{
                         Text("Don't have an account?")
@@ -50,15 +50,23 @@ struct SignIn: View{
                 Spacer()
             }
         }
-        .task {
-            await viewModelAdapter.observeState()
-        }
-        .onChange(of: viewModelAdapter.navigate) { _, newValue in
+        .onChange(of: viewModel.state.navigate) { _, newValue in
             if newValue {
                 navigation.navigateToStartDestination()
-                iOSViewModelAdapter.changeDestination(destination: .conversations)
-                viewModelAdapter.resetNavigate()
+                viewModel.resetNavigate()
             }
+        }
+    }
+}
+
+extension SignInViewModel{
+    var state: SignInUi {
+        get{
+            return self.state(
+                \.signInUiState,
+                 equals: { $0 == $1 },
+                 mapper: { $0 }
+            )
         }
     }
 }

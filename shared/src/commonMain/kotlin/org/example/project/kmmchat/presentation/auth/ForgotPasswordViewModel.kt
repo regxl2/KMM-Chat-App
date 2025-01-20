@@ -1,7 +1,7 @@
 package org.example.project.kmmchat.presentation.auth
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import dev.icerock.moko.mvvm.flow.cStateFlow
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -18,7 +18,7 @@ class ForgotPasswordViewModel(private val authRepository: AuthRepository) :
             navigateToOtp = false
         )
     )
-    val forgotPasswordUiState = _forgotPasswordUiState.asStateFlow()
+    val forgotPasswordUiState = _forgotPasswordUiState.asStateFlow().cStateFlow()
 
     fun onEmailChange(email: String) {
         _forgotPasswordUiState.value = _forgotPasswordUiState.value.copy(email = email)

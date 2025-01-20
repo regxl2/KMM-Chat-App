@@ -1,15 +1,12 @@
 package org.example.project.kmmchat.presentation.chat
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+
+import dev.icerock.moko.mvvm.flow.cStateFlow
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.example.project.kmmchat.di.OS
@@ -29,30 +26,38 @@ class ChatViewModel(
 ) : ViewModel() {
 
     private val _chat =
-        MutableStateFlow(ChatUi(conversationId = "", conversationType = ChatType.CHAT, name = "", avatar = null, messages = emptyList()))
-    val chat: StateFlow<ChatUi> = _chat.asStateFlow()
+        MutableStateFlow(
+            ChatUi(
+                conversationId = "",
+                conversationType = ChatType.CHAT,
+                name = "",
+                avatar = null,
+                messages = emptyList()
+            )
+        )
+    val chat = _chat.asStateFlow().cStateFlow()
 
     private val _loading = MutableStateFlow(false)
-    val loading = _loading.asStateFlow()
+    val loading = _loading.asStateFlow().cStateFlow()
 
     private val _error = MutableStateFlow<String?>(null)
-    val error = _error.asStateFlow()
+    val error = _error.asStateFlow().cStateFlow()
 
     private val _text = MutableStateFlow("")
-    val text = _text.asStateFlow()
+    val text = _text.asStateFlow().cStateFlow()
 
-    private var getMessagesJob : Job? = null
-    private var loadMessageJob : Job? = null
+    private var getMessagesJob: Job? = null
+    private var loadMessageJob: Job? = null
 
     init {
-        if (os == OS.ANDROID){
+        if(os == OS.ANDROID){
             initStates()
         }
     }
 
     fun initStates(){
-        observeMessages()
         loadChatInformation()
+        observeMessages()
     }
 
     fun initializeChat(conversationId: String, conversationType: ChatType, name: String) {
@@ -79,30 +84,34 @@ class ChatViewModel(
                     contentType = ContentType.TEXT,
                 )
             )
-            when(result){
+            when (result) {
                 is Result.Success -> {
                     onTextChange("")
                 }
+
                 is Result.Error -> {}
             }
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeMessages() {
         getMessagesJob?.cancel()
         getMessagesJob = viewModelScope.launch {
-            credentialsRepository.getUserId().flatMapLatest { userId ->
-                if (userId != null) {
-                    val webSocketDetails = WebSocketDetails(userId = userId, conversationId = chat.value.conversationId)
-                    chatRepository.getMessages(webSocketDetails).map { it.toMessageResponseUIForChatUi() }
-                } else {
-                    flowOf()
-                }
-            }.collect { message ->
-                println(message.content)
-                _chat.value = _chat.value.copy(messages = _chat.value.messages + message)
+            val userId = credentialsRepository.getUserId().firstOrNull()
+            if(userId == null){
+                _error.value = "Invalid credentials"
+                return@launch
             }
+            val webSocketDetails = WebSocketDetails(
+                userId = userId,
+                conversationId = chat.value.conversationId
+            )
+            chatRepository.getMessages(webSocketDetails)
+                .map { it.toMessageResponseUIForChatUi() }
+                .collect{ message ->
+                    println(message.content)
+                    _chat.value = _chat.value.copy(messages = _chat.value.messages + message)
+                }
         }
     }
 
@@ -112,7 +121,7 @@ class ChatViewModel(
             _loading.value = true
             _error.value = null
             val token = credentialsRepository.getToken().firstOrNull()
-            if(token == null){
+            if (token == null) {
                 _loading.value = false
                 _error.value = "Invalid Credential"
                 return@launch
@@ -124,9 +133,9 @@ class ChatViewModel(
                 }
                 is Result.Success -> {
                     if (result.data != null) {
-                        _chat.value = _chat.value.copy(messages = result.data.map { it.toMessageResponseUIForChatUi() })
-                    }
-                    else{
+                        _chat.value =
+                            _chat.value.copy(messages = result.data.map { it.toMessageResponseUIForChatUi() })
+                    } else {
                         _error.value = "No messages"
                     }
                 }
@@ -143,20 +152,16 @@ class ChatViewModel(
         disconnect()
     }
 
-    private fun disconnect(){
+    private fun disconnect() {
         getMessagesJob?.cancel()
-        getMessagesJob?.cancel()
-        getMessagesJob = null
-        loadMessageJob = null
+        loadMessageJob?.cancel()
         viewModelScope.launch {
             chatRepository.disconnect()
         }
     }
 
     override fun onCleared() {
-        viewModelScope.launch {
-            chatRepository.disconnect()
-        }
+        disconnect()
         super.onCleared()
     }
 }

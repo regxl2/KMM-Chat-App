@@ -50,6 +50,8 @@ struct MessageItem: View {
                         .padding(.all, 8)
                         .background(Color.gray.opacity(0.2))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
+                default:
+                    ErrorText(text: "Unknown Error")
                 }
                 Text(message.createdAt).font(Font.system(size: 12))
             }

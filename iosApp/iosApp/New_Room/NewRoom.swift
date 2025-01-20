@@ -6,20 +6,21 @@
 //  Copyright © 2025 orgName. All rights reserved.
 //
 import SwiftUI
+import Shared
 
 struct NewRoom: View{
     @EnvironmentObject private var navigation: Navigation
     @Environment(\.dismiss) var dismiss
-    @StateObject var viewModelAdapter: NewRoomViewModelAdapter = NewRoomViewModelAdapter()
+    @ObservedObject var viewModel = ViewModelProvider.shared.newRoomViewModel
     var body: some View{
         ZStack{
             VStack{
                 RectangularTextField(
                     title: "Room Name",
-                    text: Binding(get: { viewModelAdapter.roomName }, set: {value in viewModelAdapter.onValueChange(newText: value)})
+                    text: Binding(get: { viewModel.roomNameState }, set: {value in viewModel.onValueChange(newText: value)})
                 )
                 .padding()
-                if let error = viewModelAdapter.error{
+                if let error = viewModel.errorState {
                     ErrorText(text: error)
                 }
                 Spacer()
@@ -29,7 +30,7 @@ struct NewRoom: View{
                 HStack{
                     Spacer()
                     Button(action: {
-                        viewModelAdapter.addRoom()
+                        viewModel.addRoom()
                     }){
                         Image(systemName: "checkmark.circle")
                             .font(.system(size: 24, weight: .bold))
@@ -43,14 +44,14 @@ struct NewRoom: View{
                 }
             }
         }
-        .task{
-            await viewModelAdapter.observeStates()
-        }
-        .onChange(of: viewModelAdapter.navigate) { _, newValue in
+        .onChange(of: viewModel.navigateState) { _, newValue in
             if newValue {
                 navigation.navigateBack()
-                viewModelAdapter.resetNavigate()
+                viewModel.resetNavigate()
             }
+        }
+        .onDisappear{
+            viewModel.resetStates()
         }
         .navigationBarBackButtonHidden(true)
         .navigationTitle("New Room")
@@ -62,6 +63,24 @@ struct NewRoom: View{
                     navigation.popBackStack()
                 }
             }
+        }
+    }
+}
+
+extension NewRoomViewModel{
+    var roomNameState: String {
+        get{
+            return self.state(\.roomName) ?? ""
+        }
+    }
+    var errorState: String?{
+        get{
+            return self.stateNullable(\.error)
+        }
+    }
+    var navigateState: Bool {
+        get{
+            return self.state(\.navigate)
         }
     }
 }

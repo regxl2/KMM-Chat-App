@@ -44,7 +44,7 @@ export const searchForRoomUsers = async (req: express.Request, res: express.Resp
         const queryUser = await User.find({name: {$regex: query, $options: 'i'}, isVerified: true})
             .select({name: 1, email: 1});
         const roomUsers = new Set(room.users);
-        const users = queryUser.map(user => {
+        const users = queryUser.map( user => {
             return {
                 _id: user._id,
                 email: user.email,

@@ -9,16 +9,25 @@
 /* Begin PBXBuildFile section */
 		5B3C15112D075A1300BE968E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B3C150B2D075A1300BE968E /* Assets.xcassets */; };
 		5B3C151D2D075A1300BE968E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C150E2D075A1300BE968E /* iOSApp.swift */; };
-		5B9B53352D1841020026B38A /* ContentViewModelAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9B53342D1840F10026B38A /* ContentViewModelAdapter.swift */; };
 		5B9B533A2D1850060026B38A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9B53392D1850010026B38A /* ContentView.swift */; };
+		5BB516AA2D3C281B0078BF27 /* CFlowExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB516A32D3C281B0078BF27 /* CFlowExt.swift */; };
+		5BB516AB2D3C281B0078BF27 /* ViewModelBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB516A52D3C281B0078BF27 /* ViewModelBinding.swift */; };
+		5BB516AC2D3C281B0078BF27 /* ViewModelObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB516A62D3C281B0078BF27 /* ViewModelObservable.swift */; };
+		5BB516AD2D3C281B0078BF27 /* ViewModelState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB516A72D3C281B0078BF27 /* ViewModelState.swift */; };
+		5BB516AE2D3C281B0078BF27 /* ViewModelStateNullable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB516A82D3C281B0078BF27 /* ViewModelStateNullable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		5B3C150B2D075A1300BE968E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5B3C150D2D075A1300BE968E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5B3C150E2D075A1300BE968E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
-		5B9B53342D1840F10026B38A /* ContentViewModelAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewModelAdapter.swift; sourceTree = "<group>"; };
 		5B9B53392D1850010026B38A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		5BB516A32D3C281B0078BF27 /* CFlowExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFlowExt.swift; sourceTree = "<group>"; };
+		5BB516A42D3C281B0078BF27 /* mokoMvvmFlowSwiftUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mokoMvvmFlowSwiftUI.h; sourceTree = "<group>"; };
+		5BB516A52D3C281B0078BF27 /* ViewModelBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelBinding.swift; sourceTree = "<group>"; };
+		5BB516A62D3C281B0078BF27 /* ViewModelObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelObservable.swift; sourceTree = "<group>"; };
+		5BB516A72D3C281B0078BF27 /* ViewModelState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelState.swift; sourceTree = "<group>"; };
+		5BB516A82D3C281B0078BF27 /* ViewModelStateNullable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelStateNullable.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* KMM  Chat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KMM  Chat.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -56,6 +65,7 @@
 		5B3C150F2D075A1300BE968E /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				5BB516A92D3C281B0078BF27 /* mokoMvvmFlowSwiftUI */,
 				5BA42ECD2D34CF4900959021 /* Add_Room_Member */,
 				5BA42E902D34BC0D00959021 /* New_Room */,
 				5B1D9F672D339E1700FA4FA8 /* New_Conversation */,
@@ -68,10 +78,22 @@
 				5B3C150B2D075A1300BE968E /* Assets.xcassets */,
 				5B3C150D2D075A1300BE968E /* Info.plist */,
 				5B9B53392D1850010026B38A /* ContentView.swift */,
-				5B9B53342D1840F10026B38A /* ContentViewModelAdapter.swift */,
 				5B3C150E2D075A1300BE968E /* iOSApp.swift */,
 			);
 			path = iosApp;
+			sourceTree = "<group>";
+		};
+		5BB516A92D3C281B0078BF27 /* mokoMvvmFlowSwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				5BB516A32D3C281B0078BF27 /* CFlowExt.swift */,
+				5BB516A42D3C281B0078BF27 /* mokoMvvmFlowSwiftUI.h */,
+				5BB516A52D3C281B0078BF27 /* ViewModelBinding.swift */,
+				5BB516A62D3C281B0078BF27 /* ViewModelObservable.swift */,
+				5BB516A72D3C281B0078BF27 /* ViewModelState.swift */,
+				5BB516A82D3C281B0078BF27 /* ViewModelStateNullable.swift */,
+			);
+			path = mokoMvvmFlowSwiftUI;
 			sourceTree = "<group>";
 		};
 		7555FF72242A565900829871 = {
@@ -208,7 +230,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B9B533A2D1850060026B38A /* ContentView.swift in Sources */,
-				5B9B53352D1841020026B38A /* ContentViewModelAdapter.swift in Sources */,
+				5BB516AA2D3C281B0078BF27 /* CFlowExt.swift in Sources */,
+				5BB516AB2D3C281B0078BF27 /* ViewModelBinding.swift in Sources */,
+				5BB516AC2D3C281B0078BF27 /* ViewModelObservable.swift in Sources */,
+				5BB516AD2D3C281B0078BF27 /* ViewModelState.swift in Sources */,
+				5BB516AE2D3C281B0078BF27 /* ViewModelStateNullable.swift in Sources */,
 				5B3C151D2D075A1300BE968E /* iOSApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -352,6 +378,7 @@
 					"$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -379,6 +406,7 @@
 					"$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

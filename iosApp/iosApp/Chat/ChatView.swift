@@ -14,25 +14,25 @@ struct ChatView: View {
 
     @EnvironmentObject private var navigation: Navigation
     @Environment(\.dismiss) var dismiss
-    @StateObject private var viewModelAdapter: ChatViewModelAdapter
+    @ObservedObject var viewModel: ChatViewModel = ViewModelProvider.shared.chatViewModel
     
     init(conversationId: String, conversationType: ChatType, name: String){
-        _viewModelAdapter = StateObject(wrappedValue: ChatViewModelAdapter(conversationId: conversationId, conversationType: conversationType, name: name))
+        viewModel.initializeChat(conversationId: conversationId, conversationType: conversationType, name: name)
     }
     
     var body: some View {
         VStack{
-            if(viewModelAdapter.isLoading){
+            if(viewModel.loadingState){
                 LoadingScreen()
             }
-            if let error = viewModelAdapter.error{
+            if let error = viewModel.errorState {
                 ErrorScreen(text: error)
             }
             else{
                 ScrollViewReader{ proxy in
                     ScrollView(showsIndicators: false){
                         LazyVStack{
-                            ForEach(viewModelAdapter.chat.messages, id: \.self){ message in
+                            ForEach(viewModel.chatState.messages, id: \.self){ message in
                                 MessageItem(message: message)
                             }
                         }
@@ -40,7 +40,7 @@ struct ChatView: View {
                             .frame(height: 1)
                             .id("bottomID")
                     }
-                    .onChange(of: viewModelAdapter.chat.messages.count) {
+                    .onChange(of: viewModel.chatState ) {
                         withAnimation {
                             proxy.scrollTo("bottomID", anchor: .bottom)
                         }
@@ -49,10 +49,17 @@ struct ChatView: View {
             }
             SendMessageView(
                 text: Binding(
-                    get: {viewModelAdapter.text},
-                    set: { newText in viewModelAdapter.onTextChange(newText: newText)}
+                    get: { viewModel.textState },
+                    set: { newText in viewModel.onTextChange(newText: newText)}
                 ),
-                onClickSend: {viewModelAdapter.sendMessage()})
+                onClickSend: { viewModel.sendMessage() }
+            )
+        }
+        .onAppear{
+            viewModel.doInitStates()
+        }
+        .onDisappear{
+            viewModel.clearStates()
         }
         .navigationBarBackButtonHidden(true)
         .toolbar{
@@ -62,13 +69,13 @@ struct ChatView: View {
                     navigation.popBackStack()
                 }
             }
-            if viewModelAdapter.chat.conversationType == .room {
+            if viewModel.chatState.conversationType == .room {
                 ToolbarItem(placement: .topBarTrailing){
                     Menu{
                         Button("Add members") {
                             navigation.navigateTo(
                                 destination: NavRoutes.AddRoomMember(
-                                    conversationId: viewModelAdapter.chat.conversationId)
+                                    conversationId: viewModel.chatState.conversationId)
                             )
                         }
                     }
@@ -80,14 +87,39 @@ struct ChatView: View {
                 }
             }
         }
-        .task{
-            await viewModelAdapter.observeState()
-        }
         .padding(8)
-        .navigationTitle(viewModelAdapter.chat.name)
+        .navigationTitle(viewModel.state(\.chat, equals: {$0 == $1}, mapper: { $0.name }))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+extension ChatViewModel{
+    var chatState: ChatUi{
+        get{
+            return self.state(
+                \.chat,
+                 equals: { $0 == $1 },
+                 mapper: { $0 }
+            )
+        }
+    }
+    var loadingState: Bool {
+        get{
+            return self.state(\.loading)
+        }
+    }
+    var errorState: String? {
+        get{
+            return self.stateNullable(\.error)
+        }
+    }
+    var textState: String {
+        get{
+            return self.state(\.text) ?? ""
+        }
+    }
+}
+
 
 
 #Preview {

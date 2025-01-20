@@ -13,16 +13,16 @@ struct PasswordTextField: View{
     
     var body: some View{
         HStack{
-            if(showPassword){
-                TextField(title, text: $password)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
+            Group{
+                if(showPassword){
+                    TextField(title, text: $password)
+                }
+                else{
+                    SecureField(title, text: $password)
+                }
             }
-            else{
-                SecureField(title, text: $password)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-            }
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
             Image(systemName: showPassword ? "eye.slash" : "eye")
                 .onTapGesture {
                     showPassword.toggle()
