@@ -26,6 +26,11 @@
 # Chat Application
 
 A modern chat application built using Kotlin Multiplatform for the frontend (Android & iOS) and TypeScript for the backend.
+The application offers secure user authentication using JWT for login and Nodemailer for email verification, 
+ensuring only verified users can access the chat. Users can engage in real-time one-to-one chats by searching 
+for other users and exchanging messages instantly via WebSockets, with all data securely stored in MongoDB.
+Additionally, the app supports group chats, allowing users to create or join groups and communicate with multiple 
+participants simultaneously, leveraging Redis for real-time messaging and MongoDB for persistent storage.
 
 ## Project Structure
 
@@ -33,7 +38,7 @@ A modern chat application built using Kotlin Multiplatform for the frontend (And
 ├── composeApp/               # Shared Compose Multiplatform code
 │   ├── commonMain/          # Common code for all platforms
 │   ├── androidMain/         # Android-specific code
-│   └── iosMain/            # iOS-specific code
+│   
 │
 ├── iosApp/                  # iOS application entry point
 │   └── SwiftUI code
