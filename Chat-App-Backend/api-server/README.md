@@ -19,7 +19,7 @@ npm install
 ```
 
 ### 3. Configure Environment Variables
-Create a `.env` file in the project root with the following contents [For KMM contest, retrieve the required .env files using the provided link](https://docs.google.com/document/d/17Ltng8svqPFX-tUWAH1Fs6Ku_1V7z9pigDZIkqNTmqg/edit?usp=sharing):
+Create a `.env` file in the project root with the following contents:
 ```
 API_SERVER_PORT=YOUR_PORT_NUMBER
 DATABASE_URL=YOUR_MONGODB_URL
